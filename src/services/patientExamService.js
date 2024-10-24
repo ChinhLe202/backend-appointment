@@ -97,9 +97,29 @@ let getPatientExamsByPatientId = async (patientId) => {
     });
 };
 
+let getDetailPatientExamsByPatientId = async (patientId, dateBooking, timeBooking) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            console.log(patientId, dateBooking, timeBooking);
+            let exams = await db.patient_exam.findOne({
+                where: { patientId: patientId, dateBooking: dateBooking, timeBooking: timeBooking },
+            });
+            if (exams) {
+                resolve(exams);
+            } else {
+                resolve({
+                    message: "No exams found for this patient",
+                });
+            }
+        } catch (e) {
+            reject(e);
+        }
+    });
+};
 
 module.exports = {
     createNewPatientExam: createNewPatientExam,
     updatePatientExamById: updatePatientExamById,
-    getPatientExamsByPatientId: getPatientExamsByPatientId
+    getPatientExamsByPatientId: getPatientExamsByPatientId,
+    getDetailPatientExamsByPatientId: getDetailPatientExamsByPatientId
 };

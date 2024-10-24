@@ -254,6 +254,18 @@ let getPatientExams = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 };
+
+let getDetailPatientExam = async (req, res) => {
+    let patientId = req.query.patientId;
+    let dateBooking = req.query.dateBooking;
+    let timeBooking = req.query.timeBooking;
+    try {
+        let result = await patientExamService.getDetailPatientExamsByPatientId(patientId, dateBooking, timeBooking);
+        return res.status(200).json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
 module.exports = {
     getSchedule: getSchedule,
     getCreateSchedule: getCreateSchedule,
@@ -268,5 +280,6 @@ module.exports = {
     getListDoctors: getListDoctors,
     postPatientExam: postPatientExam,
     getPatientExams: getPatientExams,
-    updatePatientExam: updatePatientExam
+    updatePatientExam: updatePatientExam,
+    getDetailPatientExam: getDetailPatientExam
 };

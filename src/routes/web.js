@@ -135,6 +135,7 @@ let initRoutes = (app) => {
     router.post('/api/post-patient-exam', doctor.postPatientExam);
     router.post('/api/update-patient-exam', doctor.updatePatientExam);
     router.get('/api/get-patient-exam', doctor.getPatientExams);
+    router.get('/api/get-detail-patient-exam', doctor.getDetailPatientExam);
 
     router.get('/supporter/manage/customers', auth.checkLoggedIn, supporter.getManageCustomersPage);
     router.get('/supporter/get-new-patients', auth.checkLoggedIn, supporter.getNewPatients);
