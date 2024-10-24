@@ -8,6 +8,7 @@ module.exports = (sequelize, DataTypes) => {
     }, {});
     Status.associate = function(models) {
         models.Status.hasOne(models.Patient);
+        models.Status.hasOne(models.patient_exam);
     };
     return Status;
 };

@@ -1,5 +1,6 @@
 import doctorService from "./../services/doctorService";
 import userService from "./../services/userService";
+import patientExamService from "./../services/patientExamService";
 import _ from "lodash";
 import moment from "moment";
 import multer from "multer";
@@ -18,7 +19,6 @@ function stringToDate(_date, _format, _delimiter) {
     return new Date(dateItems[yearIndex], month, dateItems[dayIndex]);
 
 }
-
 let getSchedule = async (req, res) => {
     try {
         let threeDaySchedules = [];
@@ -216,7 +216,44 @@ let getListDoctors = async (req, res) => {
     }
 };
 
+let postPatientExam = async (req, res) => {
+    try {
+        let item = req.body;
+        item.createdAt = Date.now();
+        console.log(item);
+        let patientExam = await patientExamService.createNewPatientExam(item);
+        return res.status(200).json({
+            status: 1,
+            message: 'success',
+            patientExam: patientExam
+        })
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(e);
+    }
+};
+let updatePatientExam = async (req, res) => {
+    //let examId = req.params.id;  // Lấy id từ params
+    let data = req.body;         // Lấy thông tin cần cập nhật từ body request
 
+    try {
+        let result = await patientExamService.updatePatientExamById(data);
+        return res.status(200).json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+// Hàm để lấy danh sách patient_exam theo patientId
+let getPatientExams = async (req, res) => {
+    let patientId = req.query.patientId;  // Lấy patientId từ params
+    try {
+        let result = await patientExamService.getPatientExamsByPatientId(patientId);
+        return res.status(200).json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
 module.exports = {
     getSchedule: getSchedule,
     getCreateSchedule: getCreateSchedule,
@@ -228,5 +265,8 @@ module.exports = {
     postSendFormsToPatient: postSendFormsToPatient,
     postCreateChart: postCreateChart,
     postAutoCreateAllDoctorsSchedule: postAutoCreateAllDoctorsSchedule,
-    getListDoctors: getListDoctors
+    getListDoctors: getListDoctors,
+    postPatientExam: postPatientExam,
+    getPatientExams: getPatientExams,
+    updatePatientExam: updatePatientExam
 };

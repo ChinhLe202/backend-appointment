@@ -1,21 +1,21 @@
 <% extend("master.ejs") %>
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h3 mb-0 text-gray-800">List of appointment appointments</h1>
+    <h1 class="h3 mb-0 text-gray-800">Danh sách lịch hẹn</h1>
 
 </div>
 
 <!-- Content Row -->
 <div class="card shadow mb-4">
     <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">List of appointment appointments</h6>
+        <h6 class="m-0 font-weight-bold text-primary">Danh sách lịch hẹn</h6>
         <div class="my-3">
-            <label for="dateDoctorAppointment">Time: </label>
+            <label for="dateDoctorAppointment">Ngày: </label>
             <form method="GET" action="/doctor/manage/appointment">
                 <div class="form-row">
                     <input id="dateDoctorAppointment" name="dateDoctorAppointment" value="<%= date %>" type="text"
                            class="form-control col-4 mr-4">
-                    <button class="btn btn-primary" type="submit">Search</button>
+                    <button class="btn btn-primary" type="submit">Tìm kiếm</button>
                 </div>
 
             </form>
@@ -25,11 +25,11 @@
         <div class="table-responsive">
             <table class="table table-bordered">
                 <tr>
-                    <th>Time</th>
-                    <th>No</th>
-                    <th> Name</th>
-                    <th>Gender</th>
-                    <th> Action</th>
+                    <th>Thời gian</th>
+                    <th>STT</th>
+                    <th>Tên</th>
+                    <th>Giới tính</th>
+                    <th> Hành động</th>
                 </tr>
                 <% if(appointments['08:00 - 09:00']) { %>
                     <tr>
@@ -37,26 +37,28 @@
                     </tr>
                     <% appointments['08:00 - 09:00'].forEach(function(x, index) { %>
                         <tr>
-                            <td><%= index + 1 %></td>
+                            <td><%= x.id %></td>
                             <td><%= x.name %></td>
                             <td>
-                                <% if(x.gender === 'male') { %> Male
+                                <% if(x.gender === 'male') { %> Nam
                                 <% } %>
-                                <% if(x.gender === 'female') { %> Female
+                                <% if(x.gender === 'female') { %> Nữ
                                 <% } %>
                             </td>
 
                             <td class="mw-100 w-25">
                                 <button title="View patient's information" type="button" data-patient-id="<%= x.id %>"
-                                        class="btn btn-info doctor-view-detail">Detail
+                                        class="btn btn-info doctor-view-detail">Chi tiết
                                 </button>
                                 <button title="Send the bill to the patient who has completed the examination" type="button"
-                                        data-patient-id="<%= x.id %>"
+                                        data-patient-id="<%= x.patientId %>"
+                                        data-doctor-id="<%= x.doctorId %>"
+                                        data-patient='<%= JSON.stringify(x) %>'
                                         data-is-send-forms="<%= x.isSentForms %>"
                                         class="btn btn-primary doctor-send-forms">
-                                    Send the Invoice
+                                    Kết quả
                                 </button>
-                                <% if(x.isSentForms){ %>
+                                <!-- <% if(x.isSentForms){ %>
                                     <i title="Invoice sent" data-patient-id="<%= x.id %>" class="fa fa-check-circle" style="color: #36b9cc"
                                        aria-hidden="true"></i>
                                 <% } else { %>
@@ -64,7 +66,7 @@
                                        aria-hidden="true"></i>
                                 <% } %>
                                 <i class="fa fa-trash-o" style="cursor: pointer" data-patient-id="<%= x.id %>" aria-hidden="true"
-                                   title="Cancellation of examination with the patient"></i>
+                                   title="Cancellation of examination with the patient"></i> -->
                             </td>
                         </tr>
                     <% }) %>
@@ -75,26 +77,28 @@
                     </tr>
                     <% appointments['09:00 - 10:00'].forEach(function(x, index) { %>
                         <tr>
-                            <td><%= index + 1 %></td>
+                            <td><%= x.id %></td>
                             <td><%= x.name %></td>
                             <td>
-                                <% if(x.gender === 'male') { %> Male
+                                <% if(x.gender === 'male') { %> Nam
                                 <% } %>
-                                <% if(x.gender === 'female') { %> Female
+                                <% if(x.gender === 'female') { %> Nữ
                                 <% } %>
                             </td>
 
                             <td>
                                 <button title="View patient's information" type="button" data-patient-id="<%= x.id %>"
-                                        class="btn btn-info doctor-view-detail">Detail
+                                        class="btn btn-info doctor-view-detail">Chi tiết
                                 </button>
                                 <button title="Send the bill to the patient who has completed the examination" type="button"
-                                        data-patient-id="<%= x.id %>"
+                                        data-patient-id="<%= x.patientId %>"
+                                        data-doctor-id="<%= x.doctorId %>"
+                                        data-patient='<%= JSON.stringify(x) %>'
                                         data-is-send-forms="<%= x.isSentForms %>"
                                         class="btn btn-primary doctor-send-forms">
-                                    Send the Invoice
+                                    Kết quả
                                 </button>
-                                <% if(x.isSentForms){ %>
+                                <!-- <% if(x.isSentForms){ %>
                                     <i title="Invoice sent" data-patient-id="<%= x.id %>" class="fa fa-check-circle" style="color: #36b9cc"
                                        aria-hidden="true"></i>
                                 <% } else { %>
@@ -102,7 +106,7 @@
                                        aria-hidden="true"></i>
                                 <% } %>
                                 <i class="fa fa-trash-o" style="cursor: pointer" data-patient-id="<%= x.id %>" aria-hidden="true"
-                                   title="Cancellation of examination with the patient"></i>
+                                   title="Cancellation of examination with the patient"></i> -->
 
                             </td>
                         </tr>
@@ -114,26 +118,28 @@
                     </tr>
                     <% appointments['10:00 - 11:00'].forEach(function(x, index) { %>
                         <tr>
-                            <td><%= index + 1 %></td>
+                            <td><%= x.id %></td>
                             <td><%= x.name %></td>
                             <td>
-                                <% if(x.gender === 'male') { %> Female
+                                <% if(x.gender === 'male') { %> Nam
                                 <% } %>
-                                <% if(x.gender === 'female') { %> Female
+                                <% if(x.gender === 'female') { %> Nữ
                                 <% } %>
                             </td>
 
                             <td>
                                 <button title="View patient's information" type="button" data-patient-id="<%= x.id %>"
-                                        class="btn btn-info doctor-view-detail">Detail
+                                        class="btn btn-info doctor-view-detail">Chi tiết
                                 </button>
                                 <button title="Send the bill to the patient who has completed the examination" type="button"
-                                        data-patient-id="<%= x.id %>"
+                                        data-patient-id="<%= x.patientId %>"
+                                        data-doctor-id="<%= x.doctorId %>"
+                                        data-patient='<%= JSON.stringify(x) %>'
                                         data-is-send-forms="<%= x.isSentForms %>"
                                         class="btn btn-primary doctor-send-forms">
-                                    Send the Invoice
+                                    Kết quả
                                 </button>
-                                <% if(x.isSentForms){ %>
+                                <!-- <% if(x.isSentForms){ %>
                                     <i title="Invoice sent" data-patient-id="<%= x.id %>" class="fa fa-check-circle" style="color: #36b9cc"
                                        aria-hidden="true"></i>
                                 <% } else { %>
@@ -141,7 +147,7 @@
                                        aria-hidden="true"></i>
                                 <% } %>
                                 <i class="fa fa-trash-o" style="cursor: pointer" data-patient-id="<%= x.id %>" aria-hidden="true"
-                                   title="Cancellation of examination with the patient"></i>
+                                   title="Cancellation of examination with the patient"></i> -->
                             </td>
                         </tr>
                     <% }) %>
@@ -152,26 +158,28 @@
                     </tr>
                     <% appointments['11:00 - 12:00'].forEach(function(x, index) { %>
                         <tr>
-                            <td><%= index + 1 %></td>
+                            <td><%= x.id %></td>
                             <td><%= x.name %></td>
                             <td>
-                                <% if(x.gender === 'male') { %> Female
+                                <% if(x.gender === 'male') { %> Nam
                                 <% } %>
-                                <% if(x.gender === 'female') { %> Female
+                                <% if(x.gender === 'female') { %> Nữ
                                 <% } %>
                             </td>
 
                             <td>
                                 <button title="View patient's information" type="button" data-patient-id="<%= x.id %>"
-                                        class="btn btn-info doctor-view-detail">Detail
+                                        class="btn btn-info doctor-view-detail">Chi tiết
                                 </button>
                                 <button title="Send the bill to the patient who has completed the examination" type="button"
-                                        data-patient-id="<%= x.id %>"
+                                        data-patient-id="<%= x.patientId %>"
+                                        data-doctor-id="<%= x.doctorId %>"
+                                        data-patient='<%= JSON.stringify(x) %>'
                                         data-is-send-forms="<%= x.isSentForms %>"
                                         class="btn btn-primary doctor-send-forms">
-                                    Send the Invoice
+                                    Kết quả
                                 </button>
-                                <% if(x.isSentForms){ %>
+                                <!-- <% if(x.isSentForms){ %>
                                     <i title="Invoice sent" data-patient-id="<%= x.id %>" class="fa fa-check-circle" style="color: #36b9cc"
                                        aria-hidden="true"></i>
                                 <% } else { %>
@@ -179,7 +187,7 @@
                                        aria-hidden="true"></i>
                                 <% } %>
                                 <i class="fa fa-trash-o" style="cursor: pointer" data-patient-id="<%= x.id %>" aria-hidden="true"
-                                   title="Cancellation of examination with the patient"></i>
+                                   title="Cancellation of examination with the patient"></i> -->
 
                             </td>
                         </tr>
@@ -191,26 +199,28 @@
                     </tr>
                     <% appointments['13:00 - 14:00'].forEach(function(x, index) { %>
                         <tr>
-                            <td><%= index + 1 %></td>
+                            <td><%= x.id %></td>
                             <td><%= x.name %></td>
                             <td>
-                                <% if(x.gender === 'male') { %> Female
+                                <% if(x.gender === 'male') { %> Nam
                                 <% } %>
-                                <% if(x.gender === 'female') { %> Female
+                                <% if(x.gender === 'female') { %> Nữ
                                 <% } %>
                             </td>
 
                             <td>
                                 <button title="View patient's information" type="button" data-patient-id="<%= x.id %>"
-                                        class="btn btn-info doctor-view-detail">Detail
+                                        class="btn btn-info doctor-view-detail">Chi tiết
                                 </button>
                                 <button title="Send the bill to the patient who has completed the examination" type="button"
-                                        data-patient-id="<%= x.id %>"
+                                        data-patient-id="<%= x.patientId %>"
+                                        data-doctor-id="<%= x.doctorId %>"
+                                        data-patient='<%= JSON.stringify(x) %>'
                                         data-is-send-forms="<%= x.isSentForms %>"
                                         class="btn btn-primary doctor-send-forms">
-                                    Send the Invoice
+                                    Kết quả
                                 </button>
-                                <% if(x.isSentForms){ %>
+                                <!-- <% if(x.isSentForms){ %>
                                     <i title="Invoice sent" data-patient-id="<%= x.id %>" class="fa fa-check-circle" style="color: #36b9cc"
                                        aria-hidden="true"></i>
                                 <% } else { %>
@@ -218,7 +228,7 @@
                                        aria-hidden="true"></i>
                                 <% } %>
                                 <i class="fa fa-trash-o" style="cursor: pointer" data-patient-id="<%= x.id %>" aria-hidden="true"
-                                   title="Cancellation of examination with the patient"></i>
+                                   title="Cancellation of examination with the patient"></i> -->
 
                             </td>
                         </tr>
@@ -230,26 +240,28 @@
                     </tr>
                     <% appointments['14:00 - 15:00'].forEach(function(x, index) { %>
                         <tr>
-                            <td><%= index + 1 %></td>
+                            <td><%= x.id %></td>
                             <td><%= x.name %></td>
                             <td>
-                                <% if(x.gender === 'male') { %> Female
+                                <% if(x.gender === 'male') { %> Nam
                                 <% } %>
-                                <% if(x.gender === 'female') { %> Female
+                                <% if(x.gender === 'female') { %> Nữ
                                 <% } %>
                             </td>
 
                             <td>
                                 <button title="View patient's information" type="button" data-patient-id="<%= x.id %>"
-                                        class="btn btn-info doctor-view-detail">Detail
+                                        class="btn btn-info doctor-view-detail">Chi tiết
                                 </button>
                                 <button title="Send the bill to the patient who has completed the examination" type="button"
-                                        data-patient-id="<%= x.id %>"
+                                        data-patient-id="<%= x.patientId %>"
+                                        data-doctor-id="<%= x.doctorId %>"
+                                        data-patient='<%= JSON.stringify(x) %>'
                                         data-is-send-forms="<%= x.isSentForms %>"
                                         class="btn btn-primary doctor-send-forms">
-                                    Send the Invoice
+                                    Kết quả
                                 </button>
-                                <% if(x.isSentForms){ %>
+                                <!-- <% if(x.isSentForms){ %>
                                     <i title="Invoice sent" data-patient-id="<%= x.id %>" class="fa fa-check-circle" style="color: #36b9cc"
                                        aria-hidden="true"></i>
                                 <% } else { %>
@@ -257,7 +269,7 @@
                                        aria-hidden="true"></i>
                                 <% } %>
                                 <i class="fa fa-trash-o" style="cursor: pointer" data-patient-id="<%= x.id %>" aria-hidden="true"
-                                   title="Cancellation of examination with the patient"></i>
+                                   title="Cancellation of examination with the patient"></i> -->
 
                             </td>
                         </tr>
@@ -269,26 +281,28 @@
                     </tr>
                     <% appointments['15:00 - 16:00'].forEach(function(x, index) { %>
                         <tr>
-                            <td><%= index + 1 %></td>
+                            <td><%= x.id %></td>
                             <td><%= x.name %></td>
                             <td>
-                                <% if(x.gender === 'male') { %> Female
+                                <% if(x.gender === 'male') { %> Nam
                                 <% } %>
-                                <% if(x.gender === 'female') { %> Female
+                                <% if(x.gender === 'female') { %> Nữ
                                 <% } %>
                             </td>
 
                             <td>
                                 <button title="View patient's information" type="button" data-patient-id="<%= x.id %>"
-                                        class="btn btn-info doctor-view-detail">Detail
+                                        class="btn btn-info doctor-view-detail">Chi tiết
                                 </button>
                                 <button title="Send the bill to the patient who has completed the examination" type="button"
-                                        data-patient-id="<%= x.id %>"
+                                        data-patient-id="<%= x.patientId %>"
+                                        data-doctor-id="<%= x.doctorId %>"
+                                        data-patient='<%= JSON.stringify(x) %>'
                                         data-is-send-forms="<%= x.isSentForms %>"
                                         class="btn btn-primary doctor-send-forms">
-                                    Send the Invoice
+                                    Kết quả
                                 </button>
-                                <% if(x.isSentForms){ %>
+                                <!-- <% if(x.isSentForms){ %>
                                     <i title="Invoice sent" data-patient-id="<%= x.id %>" class="fa fa-check-circle" style="color: #36b9cc"
                                        aria-hidden="true"></i>
                                 <% } else { %>
@@ -296,7 +310,7 @@
                                        aria-hidden="true"></i>
                                 <% } %>
                                 <i class="fa fa-trash-o" style="cursor: pointer" data-patient-id="<%= x.id %>" aria-hidden="true"
-                                   title="Cancellation of examination with the patient"></i>
+                                   title="Cancellation of examination with the patient"></i> -->
 
                             </td>
                         </tr>
@@ -308,25 +322,27 @@
                     </tr>
                     <% appointments['16:00 - 17:00'].forEach(function(x, index) { %>
                         <tr>
-                            <td><%= index + 1 %></td>
+                            <td><%= x.id %></td>
                             <td><%= x.name %></td>
                             <td>
-                                <% if(x.gender === 'male') { %> Female
+                                <% if(x.gender === 'male') { %> Nam
                                 <% } %>
-                                <% if(x.gender === 'female') { %> Female
+                                <% if(x.gender === 'female') { %> Nữ
                                 <% } %>
                             </td>
                             <td>
                                 <button title="View patient's information" type="button" data-patient-id="<%= x.id %>"
-                                        class="btn btn-info doctor-view-detail">Detail
+                                        class="btn btn-info doctor-view-detail">Chi tiết
                                 </button>
                                 <button title="Send the bill to the patient who has completed the examination" type="button"
-                                        data-patient-id="<%= x.id %>"
+                                        data-patient-id="<%= x.patientId %>"
+                                        data-doctor-id="<%= x.doctorId %>"
+                                        data-patient='<%= JSON.stringify(x) %>'
                                         data-is-send-forms="<%= x.isSentForms %>"
                                         class="btn btn-primary doctor-send-forms">
-                                    Send the Invoice
+                                    Kết quả
                                 </button>
-                                <% if(x.isSentForms){ %>
+                                <!-- <% if(x.isSentForms){ %>
                                     <i title="Invoice sent" data-patient-id="<%= x.id %>" class="fa fa-check-circle" style="color: #36b9cc"
                                        aria-hidden="true"></i>
                                 <% } else { %>
@@ -334,7 +350,7 @@
                                        aria-hidden="true"></i>
                                 <% } %>
                                 <i class="fa fa-trash-o" style="cursor: pointer" data-patient-id="<%= x.id %>" aria-hidden="true"
-                                   title="Cancellation of examination with the patient"></i>
+                                   title="Cancellation of examination with the patient"></i> -->
 
                             </td>
                         </tr>
@@ -352,7 +368,7 @@
     <div class="modal-dialog mw-100 w-75" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Patient information</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Thông tin bệnh nhân</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -360,11 +376,11 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="form-group col-4">
-                        <label class="col-form-label text-label" for="patientName">Name:</label>
+                        <label class="col-form-label text-label" for="patientName">Tên:</label>
                         <input type="text" class="form-control" id="patientName" name="patientName">
                     </div>
                     <div class="form-group col-4">
-                        <label class="col-form-label text-label" for="patientPhone">Phone number:</label>
+                        <label class="col-form-label text-label" for="patientPhone">Số điện thoại:</label>
                         <input type="text" class="form-control" id="patientPhone" name="patientPhone">
                     </div>
                     <div class="form-group col-4">
@@ -372,50 +388,25 @@
                         <input type="email" class="form-control" id="patientEmail" name="patientEmail">
                     </div>
                     <div class="form-group col-2">
-                        <label class="col-form-label text-label" for="patientDate">Date:</label>
+                        <label class="col-form-label text-label" for="patientDate">Ngày:</label>
                         <input type="text" class="form-control" id="patientDate" name="patientDate" readonly>
                     </div>
                     <div class="form-group col-2">
-                        <label class="col-form-label text-label" for="patientTime">Time:</label>
+                        <label class="col-form-label text-label" for="patientTime">Thời gian:</label>
                         <input type="text" class="form-control" id="patientTime" name="patientTime" readonly>
                     </div>
                     <div class="form-group col-4">
-                        <label class="col-form-label text-label" for="patientReason">Reason:</label>
+                        <label class="col-form-label text-label" for="patientReason">Lý do khám:</label>
                         <textarea class="form-control" name="patientReason" id="patientReason"></textarea>
                     </div>
                     <div class="form-group col-4">
-                        <label class="col-form-label text-label" for="patientAddress">Address:</label>
+                        <label class="col-form-label text-label" for="patientAddress">Địa chỉ:</label>
                         <textarea class="form-control" name="patientAddress" id="patientAddress"></textarea>
-                    </div>
-
-                    <div class="col-12">
-                        <label for="patientAddress">Extra info:</label>
-                    </div>
-
-                    <div class="form-group col-6">
-                        <label class="col-form-label text-label" for="patientHistoryBreath">History of respiratory tract diseases:</label>
-                        <textarea class="form-control" name="patientHistoryBreath" id="patientHistoryBreath"></textarea>
-                    </div>
-
-                    <div class="form-group col-6">
-                        <label class="col-form-label text-label" for="patientMoreInfo">Information on previous exams:</label>
-                        <textarea class="form-control" name="patientMoreInfo" id="patientMoreInfo"></textarea>
-                    </div>
-
-                    <div class="form-group col-12">
-                        <label class="col-form-label text-label" for="patientNote">Note:</label>
-                        <textarea class="form-control" name="patientNote" id="patientNote"></textarea>
-                    </div>
-                    <div class="col-12">
-                        <div class="col-form-label text-label">Photo of previous examination:</div>
-                        <div id="imageOldForms">
-
-                        </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="ml-3 btn btn-secondary" data-dismiss="modal">OK</button>
+                <button type="button" class="ml-3 btn btn-secondary" data-dismiss="modal">Đóng</button>
             </div>
         </div>
     </div>
@@ -488,10 +479,259 @@
     </div>
 </div>
 
+<div class="modal fade " tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true"
+     id="modalDetailPatient">
+    <div class="modal-dialog mw-100 w-75" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Kết quả khám</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <!-- Phần thêm kết quả khám -->
+                     <input type="text" hidden id="doctorId">
+                    <div class="form-group col-12">
+                        <label class="col-form-label text-label" for="examResults">Kết quả khám:</label>
+                        <div id="examResultsContainer">
+                            <div class="examResultRow row">
+                                <div class="form-group col-10">
+                                    <textarea class="form-control" name="examResults[]" placeholder="Nhập kết quả khám"></textarea>
+                                </div>
+                                <div class="form-group col-2">
+                                    <button type="button" class="btn btn-success btn-add-exam-result">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phần lịch tái khám -->
+                    <div class="form-group col-3">
+                        <label class="col-form-label text-label" for="reExamDate">Ngày tái khám:</label>
+                        <input type="date" class="form-control" id="reExamDate" name="reExamDate">
+                    </div>
+                    <div class="form-group col-3">
+                        <label class="col-form-label text-label" for="reExamTime">Giờ tái khám:</label>
+                        <select class="form-control" id="reExamTime" name="reExamTime">
+                            <!-- Khung giờ sẽ được load động dựa vào ngày đã chọn -->
+                        </select>
+                    </div>
+                    <div class="form-group col-12">
+                        <label class="col-form-label text-label" for="contentTaiKham">Nội dung tái khám</label>
+                        <textarea class="form-control" id="contentTaiKham" name="contentTaiKham" placeholder="Nhập nội dung tái khám"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="ml-3 btn btn-secondary" id="btn-cancel-patient" data-dismiss="modal">Hủy bỏ</button>
+                <button type="button" class="btn btn-primary" id="btn-confirm-patient-exam">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Content Row -->
 <script>
-    $(document).ready(function() {
-        $("#listAppointment").addClass('active');
-    })
+    $(document).ready(function () {
+    var maxIdExam = null;
+    var dataPatientNow = null;
+    $("#listAppointment").addClass('active');
+    // Xử lý chọn ngày tái khám và load khung giờ phù hợp
+    $('#reExamDate').change(function () {
+        var selectedDate = $(this).val();
+        var doctorId  = $('#doctorId').val();
+        var formattedDate = formatDateToDDMMYYYY(selectedDate);
+        console.log(formattedDate, doctorId);
+        if (formattedDate && doctorId) {
+            // Gọi AJAX để lấy danh sách khung giờ phù hợp cho ngày đã chọn
+            $.ajax({
+                url: '/doctor/get-schedule-doctor-by-date',
+                type: 'POST',
+                data: { date: formattedDate, doctorId: doctorId },
+                success: function (data) {
+                    var timeSlotSelect = $('#reExamTime');
+                    timeSlotSelect.empty(); // Xóa các option hiện tại
+                    if (data.message.length > 0) {
+                        $.each(data.message, function (key, value) {
+                            // Chỉ thêm option nếu isdisable == false
+                            if (!value.isDisable) {
+                                timeSlotSelect.append($('<option></option>').attr('value', value.time).text(value.time));
+                            }
+                        });
+
+                        // Kiểm tra nếu không có khung giờ nào hợp lệ được thêm vào
+                        if (timeSlotSelect.children().length === 0) {
+                            timeSlotSelect.append($('<option></option>').attr('value', "").text("Không có khung giờ phù hợp"));
+                        }
+                    } else {
+                        timeSlotSelect.append($('<option></option>').attr('value', "").text("Không có khung giờ phù hợp"));
+                    }
+                    
+                },
+                error: function (error) {
+                    console.error('Lỗi khi lấy khung giờ tái khám', error);
+                }
+            });
+        }
+    });
+
+$('.doctor-send-forms').click(function () {
+    var patientId = $(this).data('patient-id');  // Lấy giá trị patientId từ data attribute
+    var doctorId = $(this).data('doctor-id');
+    var data  = $(this).data('patient');
+    dataPatientNow = data;
+    console.log(dataPatientNow);
+    $('#doctorId').val(doctorId);
+    if (!patientId) {
+        console.error('Patient ID is undefined or invalid.');
+        return; // Dừng lại nếu patientId không hợp lệ
+    }
+
+    // Gọi AJAX để lấy lịch sử khám bệnh
+    $.ajax({
+        url: '/api/get-patient-exam',
+        type: 'GET',
+        data: { patientId: patientId },  // Truyền patientId vào request
+        success: function (response) {
+            // Xóa dữ liệu cũ trước khi hiển thị dữ liệu mới
+            $('#examResultsContainer').empty();
+
+            // Lặp qua các kết quả khám bệnh để hiển thị
+            if (response.length > 0) {
+                var ExamMax = response.reduce(function (prev, current) {
+                    return (prev.id > current.id) ? prev : current;
+                });
+                maxIdExam = ExamMax.id;
+                console.log(maxIdExam)
+                $.each(response, function (index, exam) {
+                    // Nếu là lần khám cuối cùng và kết quả khám hoặc đơn thuốc chưa có, cho phép nhập liệu
+                    if (exam.id == maxIdExam) {
+                        var lastExamHtml = `
+                            <div class="examResultRow row">
+                                <input type="text" hidden id="maxId" value="${maxIdExam}">
+                                <input type="text" hidden id="patientExamId" value="${exam.patientId}">
+                                <input type="text" hidden id="numberVisit" value="${exam.numberVisit}">
+                                <div class="form-group col-12">
+                                    <span class="exam-date">Lần khám ${index + 1} - Ngày: ${exam.dateBooking} - Thời gian ${exam.timeBooking}</span>
+                                </div>
+                                <div class="form-group col-12">
+                                    <label for="lastExamResult">Kết quả khám:</label>
+                                    <textarea class="form-control" id="lastExamResult${exam.id}" name="examResults[]" placeholder="Nhập kết quả khám"></textarea>
+                                </div>
+                                <div class="form-group col-12">
+                                    <label for="lastPrescription">Đơn thuốc:</label>
+                                    <textarea class="form-control" id="lastPrescription${exam.id}" name="examPrescriptions[]" placeholder="Nhập đơn thuốc"></textarea>
+                                </div>
+                                
+                            </div>
+                        `;
+                        $('#examResultsContainer').append(lastExamHtml);
+                    } else {
+                        // Hiển thị các kết quả khám trước đó
+                        var examHtml = `
+                            <div class="examResultRow row">
+                                <div class="form-group col-12">
+                                    <span class="exam-date">Lần khám ${index + 1} - Ngày: ${exam.dateBooking} - Thời gian ${exam.timeBooking}</span>
+                                </div>
+                                <div class="form-group col-12">
+                                    <label for="examResult-${index}">Kết quả khám:</label>
+                                    <textarea class="form-control" id="examResult-${index}" name="examResults[]" readonly>${exam.exam}</textarea>
+                                </div>
+                                <div class="form-group col-12">
+                                    <label for="examPrescription-${index}">Đơn thuốc:</label>
+                                    <textarea class="form-control" id="examPrescription-${index}" name="examPrescriptions[]" readonly>${exam.prescription}</textarea>
+                                </div>
+                            </div>
+                        `;
+                        $('#examResultsContainer').append(examHtml);
+                    }
+                });
+            }
+
+            // Hiển thị modal sau khi dữ liệu đã load
+            $('#modalDetailPatient').modal('show');
+        },
+        error: function (error) {
+            console.error('Lỗi khi lấy lịch sử khám bệnh', error);
+            alert('Không thể lấy dữ liệu lịch sử khám bệnh!');
+        }
+    });
+});
+
+function formatDateToDDMMYYYY(dateString) {
+    var date = new Date(dateString);
+    var day = ("0" + date.getDate()).slice(-2);
+    var month = ("0" + (date.getMonth() + 1)).slice(-2); // Lưu ý: tháng bắt đầu từ 0
+    var year = date.getFullYear();
+    return day + '/' + month + '/' + year;
+}
+$('#btn-confirm-patient-exam').click(function() {
+    var examId = $('#maxId').val();  // Lấy id lớn nhất từ input đã tạo trước đó
+    var lastExamResult = $('#lastExamResult' + maxIdExam).val();  // Lấy kết quả khám
+    var lastPrescription = $('#lastPrescription' + maxIdExam).val();  // Lấy đơn thuốc
+    var numberVisit = parseInt($('#numberVisit').val());
+    var patientId = $('#patientExamId'+maxIdExam).val();
+    var reExamDate = formatDateToDDMMYYYY($('#reExamDate').val());  
+    var reExamTime = $('#reExamTime').val();
+    var contentTaiKham = $('#contentTaiKham').val();
+    console.log(examId, maxIdExam, numberVisit, patientId, dataPatientNow);
+    if (lastExamResult && lastPrescription) {
+        // Nếu cả hai trường đều có dữ liệu, gọi API để cập nhật
+        $.ajax({
+            url: '/api/update-patient-exam',
+            type: 'POST',
+            data: {
+                id: examId,  // Truyền id lớn nhất
+                exam: lastExamResult,
+                prescription: lastPrescription
+            },
+            success: function(response) {
+                alert('Cập nhật thành công!');
+                if (reExamDate && reExamTime) {
+                // Gọi API post-patient-exam để thêm lịch tái khám
+                    $.ajax({
+                        url: '/api/post-patient-exam',
+                        type: 'POST',
+                        data: {
+                            dateBooking: reExamDate,
+                            timeBooking: reExamTime,
+                            patientId: dataPatientNow.patientId,
+                            numberVisit: numberVisit + 1,
+                            statusId: 1,
+                            doctorId: dataPatientNow.doctorId,
+                            name: dataPatientNow.name,
+                            phone: dataPatientNow.phone,
+                            email: dataPatientNow.email,
+                            gender: dataPatientNow.gender,
+                            address: dataPatientNow.address,
+                            year: dataPatientNow.year,
+                            description: contentTaiKham,
+                            content: contentTaiKham
+                        },
+                        success: function (data) {
+                            console.log('Thêm lịch tái khám thành công:', data);
+                            //alert('Thêm lịch tái khám thành công!');
+                        },
+                        error: function (error) {
+                            console.error('Lỗi khi thêm lịch tái khám:', error);
+                            //alert('Lỗi khi thêm lịch tái khám!');
+                        }
+                    });
+                }
+            },
+            error: function(error) {
+                console.error('Lỗi khi cập nhật kết quả khám', error);
+                alert('Cập nhật không thành công!');
+            }
+        });
+    } else {
+        alert('Vui lòng nhập đầy đủ kết quả khám và đơn thuốc trước khi xác nhận!');
+    }
+    
+});
+
+});
+
 </script>

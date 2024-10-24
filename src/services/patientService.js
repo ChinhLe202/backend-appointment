@@ -171,11 +171,12 @@ let createNewPatient = (data) => {
                     time: data.timeBooking
                 },
             }).then(async (schedule) => {
-                console.log(schedule);
                 if (schedule && schedule.sumBooking < schedule.maxBooking) {
                     let patient = await db.Patient.create(data);
                     data.patientId = patient.id;
-                    await db.ExtraInfo.create(data);
+                    await db.Patient.update({ patientId: patient.id }, { where: { id: patient.id } });
+                    
+                    //await db.ExtraInfo.create(data);
 
                     //tăng sumBooking
                     let sum = +schedule.sumBooking;
@@ -206,7 +207,7 @@ let createNewPatient = (data) => {
                         console.log("An error occurs when sending an email to: " + patient.email);
                         console.log(isEmailSend);
                     }
-
+                    await db.patient_exam.create(data);
                     resolve(patient);
                 } else {
                     resolve("Max booking")
@@ -247,7 +248,8 @@ let getListBookingPatient = (keySearch) => {
                     model: db.User, 
                     required: false,
                     attributes: ['name', 'email', 'address', 'phone']
-                }
+                },
+                order: [['id', 'DESC']]
             });
             resolve(patient);
         } catch (e) {

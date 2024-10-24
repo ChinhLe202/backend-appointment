@@ -135,7 +135,8 @@ let getScheduleDoctorByDate = (id, date) => {
             let schedule = await db.Schedule.findAll({
                 where: {
                     doctorId: id, date: date, sumBooking: { [Op.lt]: maxBooking }
-                }
+                },
+                order:[['id', 'ASC']]
             });
             let doctor = await getDoctorById(id);
 
@@ -333,7 +334,7 @@ let getPatientsBookAppointment = (data) => {
                     statusId: statusSuccessId
                 },
                 order: [ [ 'updatedAt', 'ASC' ] ],
-                attributes: [ 'id', 'name', 'gender', 'timeBooking', 'description', 'isSentForms' ]
+                attributes: [ 'id', 'name', 'email', 'phone', 'description','gender', 'year', 'address', 'dateBooking','timeBooking', 'description', 'isSentForms', 'patientId', 'doctorId' ]
             });
             resolve(patients);
         } catch (e) {

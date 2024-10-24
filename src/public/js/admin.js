@@ -1132,51 +1132,51 @@ function handleDoctorViewInfoPatient() {
 }
 
 function showModalSendForms() {
-    $('.doctor-send-forms').on('click', function(e) {
-        let patientId = $(this).attr('data-patient-id');
-        let isSend = $(this).attr('data-is-send-forms');
+    // $('.doctor-send-forms').on('click', function(e) {
+    //     let patientId = $(this).attr('data-patient-id');
+    //     let isSend = $(this).attr('data-is-send-forms');
 
-        $.ajax({
-            url: `${window.location.origin}/api/get-detail-patient-by-id`,
-            method: "POST",
-            data: { patientId: patientId },
-            success: function(data) {
-                let html = '';
-                $('#divGenerateFilesSend').empty();
-                $('#emailPatient').val(data.email);
-                $('#btnSendFilesForms').attr('data-patient-id', patientId);
-                if (data.ExtraInfo) {
-                    if (data.ExtraInfo.sendForms) {
-                        let images = JSON.parse(data.ExtraInfo.sendForms);
-                        for (let [ key, value ] of Object.entries(images)) {
-                            html += `
-                              <div class="form-row">
-                                <div class="form-group col-9">
-                                    <a type="text" class="form-control" id="nameFileSent" target="_blank" href="/images/patients/remedy/${value}" readonly="true" title="${value}" >
-                               ${value}
-                                </a>
-                                </div>
-                             </div>`;
-                        }
-                    } else {
-                        html = `
-                          <div class="form-row">
-                            <div class="form-group col-9">
-                                <label class="col-form-label text-label" for="nameFileSent"> File's name:</label>
-                                <input type="text" class="form-control" id="nameFileSent" name="nameFileSent" disabled>
-                            </div>
-                         </div>`
-                    }
-                }
-                $('#divGenerateFilesSend').append(html);
-                $('#modalSendForms').modal('show');
-            },
-            error: function(error) {
-                console.log(error);
-                alertify.error('An error occurs, please try again later!');
-            }
-        });
-    });
+    //     $.ajax({
+    //         url: `${window.location.origin}/api/get-detail-patient-by-id`,
+    //         method: "POST",
+    //         data: { patientId: patientId },
+    //         success: function(data) {
+    //             let html = '';
+    //             $('#divGenerateFilesSend').empty();
+    //             $('#emailPatient').val(data.email);
+    //             $('#btnSendFilesForms').attr('data-patient-id', patientId);
+    //             if (data.ExtraInfo) {
+    //                 if (data.ExtraInfo.sendForms) {
+    //                     let images = JSON.parse(data.ExtraInfo.sendForms);
+    //                     for (let [ key, value ] of Object.entries(images)) {
+    //                         html += `
+    //                           <div class="form-row">
+    //                             <div class="form-group col-9">
+    //                                 <a type="text" class="form-control" id="nameFileSent" target="_blank" href="/images/patients/remedy/${value}" readonly="true" title="${value}" >
+    //                            ${value}
+    //                             </a>
+    //                             </div>
+    //                          </div>`;
+    //                     }
+    //                 } else {
+    //                     html = `
+    //                       <div class="form-row">
+    //                         <div class="form-group col-9">
+    //                             <label class="col-form-label text-label" for="nameFileSent"> File's name:</label>
+    //                             <input type="text" class="form-control" id="nameFileSent" name="nameFileSent" disabled>
+    //                         </div>
+    //                      </div>`
+    //                 }
+    //             }
+    //             $('#divGenerateFilesSend').append(html);
+    //             $('#modalDetailPatient').modal('show');
+    //         },
+    //         error: function(error) {
+    //             console.log(error);
+    //             alertify.error('An error occurs, please try again later!');
+    //         }
+    //     });
+    // });
 }
 
 function handleSendFormsForPatient() {

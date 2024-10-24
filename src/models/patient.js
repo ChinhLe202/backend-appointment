@@ -16,12 +16,14 @@ module.exports = (sequelize, DataTypes) => {
         isTakeCare: DataTypes.BOOLEAN,
         createdAt: DataTypes.DATE,
         updatedAt: DataTypes.DATE,
-        deletedAt: DataTypes.DATE
+        deletedAt: DataTypes.DATE,
+        patientId: DataTypes.INTEGER
     }, {});
     Patient.associate = function(models) {
         models.Patient.belongsTo(models.User, { foreignKey: 'doctorId' });
         models.Patient.belongsTo(models.Status, { foreignKey: 'statusId' });
         models.Patient.hasOne(models.ExtraInfo);
+        models.Patient.hasMany(models.patient_exam);
         models.Patient.hasMany(models.SupporterLog);
     };
     return Patient;
