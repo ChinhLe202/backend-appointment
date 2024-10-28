@@ -5,7 +5,8 @@ import patientService from "./../services/patientService";
 
 let getInfoClinicById = async (req, res) => {
     try {
-        let clinic = await clinicService.getClinicById(req.body.id);
+        var clinicId = req.query.id;
+        let clinic = await clinicService.getClinicById(clinicId);
         return res.status(200).json({
             message: 'get info clinic successful',
             clinic: clinic

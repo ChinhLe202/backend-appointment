@@ -247,7 +247,7 @@ let getListBookingPatient = (keySearch) => {
                 include: {
                     model: db.User, 
                     required: false,
-                    attributes: ['name', 'email', 'address', 'phone']
+                    //attributes: ['name', 'email', 'address', 'phone']
                 },
                 order: [['id', 'DESC']]
             });

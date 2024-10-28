@@ -215,6 +215,26 @@ let getListDoctors = async (req, res) => {
         });
     }
 };
+let getListDoctorsFilter = async (req, res) => {
+    try {
+        let clinicId = req.query.clinicId;
+        let specializationId = req.query.specializationId;
+        let searchText = req.query.searchText;
+        let doctors = await userService.getInfoDoctorsFilter(searchText, clinicId, specializationId); 
+        return res.status(200).json({
+            status: 1,
+            message: 'success',
+            doctors: doctors
+        });
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({
+            status: 0,
+            message: 'Error fetching doctors',
+            error: e
+        });
+    }
+};
 
 let postPatientExam = async (req, res) => {
     try {
@@ -281,5 +301,6 @@ module.exports = {
     postPatientExam: postPatientExam,
     getPatientExams: getPatientExams,
     updatePatientExam: updatePatientExam,
-    getDetailPatientExam: getDetailPatientExam
+    getDetailPatientExam: getDetailPatientExam,
+    getListDoctorsFilter: getListDoctorsFilter
 };

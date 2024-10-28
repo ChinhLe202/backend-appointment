@@ -132,10 +132,12 @@ let initRoutes = (app) => {
     router.post('/doctor/send-forms-to-patient', auth.checkLoggedIn, doctor.postSendFormsToPatient);
     router.post('/doctor/auto-create-all-doctors-schedule', auth.checkLoggedIn, doctor.postAutoCreateAllDoctorsSchedule)
     router.get('/api/get-list-doctor',doctor.getListDoctors)
+    router.get('/api/get-list-doctor-filter',doctor.getListDoctorsFilter)
     router.post('/api/post-patient-exam', doctor.postPatientExam);
     router.post('/api/update-patient-exam', doctor.updatePatientExam);
     router.get('/api/get-patient-exam', doctor.getPatientExams);
     router.get('/api/get-detail-patient-exam', doctor.getDetailPatientExam);
+    router.get('/api/get-detail-clinic', clinic.getInfoClinicById);
 
     router.get('/supporter/manage/customers', auth.checkLoggedIn, supporter.getManageCustomersPage);
     router.get('/supporter/get-new-patients', auth.checkLoggedIn, supporter.getNewPatients);
