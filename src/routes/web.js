@@ -196,6 +196,8 @@ let initRoutes = (app) => {
 
     router.post("/admin/statistical", auth.checkLoggedIn, admin.getInfoStatistical);
 
+    router.get("/api/chart-count-booking", admin.getDailyBookingStats);
+
     return app.use("/", router);
 };
 module.exports = initRoutes;

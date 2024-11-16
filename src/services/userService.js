@@ -158,8 +158,8 @@ function stringToDate(_date, _format, _delimiter) {
 let getInfoStatistical = (month) => {
     return new Promise(async (resolve, reject) => {
         try {
-            let startDate = Date.parse(stringToDate(`01/${month}/2020`, "dd/MM/yyyy", "/"));
-            let endDate = Date.parse(stringToDate(`31/${month}/2020`, "dd/MM/yyyy", "/"));
+            let startDate = Date.parse(stringToDate(`01/${month}/2024`, "dd/MM/yyyy", "/"));
+            let endDate = Date.parse(stringToDate(`31/${month}/2024`, "dd/MM/yyyy", "/"));
 
             let patients = await db.Patient.findAndCountAll({
                 attributes: [ 'id','doctorId' ],

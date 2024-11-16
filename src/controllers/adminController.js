@@ -1,5 +1,6 @@
 import homeService from "./../services/homeService";
 import userService from "./../services/userService";
+import patientService from "./../services/patientService";
 import clinicService from "./../services/clinicService";
 import specializationService from "./../services/specializationService";
 import supporterService from "./../services/supporterService";
@@ -443,6 +444,17 @@ let getInfoStatistical = async (req, res) => {
     }
 };
 
+const getDailyBookingStats = async (req, res) => {
+    let month = req.query.month;
+    let year = 2024;
+    try {
+        const data = await patientService.getDailyBookingStats(month, year);
+        res.json(data); // Trả về dữ liệu dưới dạng JSON
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 module.exports = {
     getManageDoctor: getManageDoctor,
     getCreateDoctor: getCreateDoctor,
@@ -470,5 +482,7 @@ module.exports = {
     deleteClinicById: deleteClinicById,
     deleteDoctorById: deleteDoctorById,
     deleteSpecializationById: deleteSpecializationById,
-    deletePostById: deletePostById
+    deletePostById: deletePostById,
+
+    getDailyBookingStats:getDailyBookingStats
 };

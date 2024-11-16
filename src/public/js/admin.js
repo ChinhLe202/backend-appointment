@@ -1265,10 +1265,11 @@ function statisticalAdmin(month) {
         url: `${window.location.origin}/admin/statistical`,
         data: { month: month },
         success: function(data) {
+            console.log(data);
             $('#sumPatient').text(data.patients.count);
             $('#sumDoctor').text(data.doctors.count);
-            $('#sumPost').text(data.posts.count);
-
+            //$('#sumPost').text(data.posts.count);
+            console.log(data);
             if (data.bestDoctor === '') {
                 $('#bestDoctor').text(`No information`);
             } else {

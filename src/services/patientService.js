@@ -8,7 +8,7 @@ const statusPendingId = 3;
 const statusFailedId = 2;
 const statusSuccessId = 1;
 const statusNewId = 4;
-const { Op } = require('sequelize');
+const { Op, fn, col, literal } = require('sequelize');
 
 let getInfoBooking = (id) => {
     return new Promise(async (resolve, reject) => {
@@ -303,6 +303,38 @@ let getComments = () => {
         }
     });
 };
+
+let getDailyBookingStats = (month, year) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            // Lấy thông tin bệnh nhân theo ngày, lọc theo tháng và năm
+            let dailyStats = await db.Patient.findAll({
+                attributes: [
+                    ['dateBooking', 'date'], // Sử dụng trực tiếp chuỗi `dateBooking`
+                    [fn('COUNT', col('id')), 'count']
+                ],
+                where: {
+                    [Op.and]: [
+                        literal(`STR_TO_DATE(dateBooking, '%d/%m/%Y') >= '${year}-${month.toString().padStart(2, '0')}-01'`),
+                        literal(`STR_TO_DATE(dateBooking, '%d/%m/%Y') < '${year}-${(month + 1).toString().padStart(2, '0')}-01'`)
+                    ]
+                },
+                group: ['dateBooking'],
+                order: [[col('dateBooking'), 'ASC']]
+            });
+            console.log(dailyStats);
+            // Chuyển đổi kết quả để trả về mảng dữ liệu cho biểu đồ
+            const result = dailyStats.map(stat => ({
+                date: stat.getDataValue('date'),
+                count: stat.getDataValue('count')
+            }));
+
+            resolve(result);
+        } catch (e) {
+            reject(e);
+        }
+    });
+};
 module.exports = {
     getInfoBooking: getInfoBooking,
     getForPatientsTabs: getForPatientsTabs,
@@ -311,5 +343,6 @@ module.exports = {
     getDetailPatient: getDetailPatient,
     getLogsPatient: getLogsPatient,
     getComments: getComments,
-    getListBookingPatient: getListBookingPatient
+    getListBookingPatient: getListBookingPatient,
+    getDailyBookingStats: getDailyBookingStats
 };
