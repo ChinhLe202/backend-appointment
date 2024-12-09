@@ -1,8 +1,11 @@
 import {tranRegisterEmail, tranForgotPassword} from "../../lang/en";
 import {sendEmail} from "./../config/mailer";
 import userService from "./../services/userService";
+const jwt = require('jsonwebtoken');
+const passport = require('passport');
+const bcrypt = require('bcrypt');
 require('dotenv').config();
-
+const SECRET_KEY = process.env.JWT_SECRET;
 let register = ({user}, linkVerify) => {
     return new Promise(async (resolve, reject) => {
         let isEmailSend = await sendEmail(user.local.email, tranRegisterEmail.subject, tranRegisterEmail.template(linkVerify));
@@ -45,10 +48,44 @@ let setNewPassword = (email, password) => {
             });
     });
 };
+class AuthService {
+    async authenticate(req) {
+        return new Promise((resolve, reject) => {
+            passport.authenticate('local', async (err, user, info) => {
+                if (err) {
+                    console.error('Error during authentication:', err);
+                    return reject({ message: 'Authentication error', error: err });
+                }
+                if (!user) {
+                    console.warn('Invalid credentials:', info);
+                    return reject({ message: 'Invalid credentials' });
+                }
+                // Nếu xác thực thành công
+                resolve(user);
+            })(req);
+        });
+    }
 
+    generateToken(user) {
+        const payload = {
+            id: user.id,
+            email: user.email,
+            role: user.roleId || 0, // Thêm vai trò (mặc định là user)
+            status: user.isActive || 0 // Thêm trạng thái (mặc định là active)
+        };
+        return jwt.sign(payload, SECRET_KEY, { expiresIn: '1h' });
+    }
+
+    async verifyPassword(inputPassword, storedPassword) {
+        // So sánh mật khẩu người dùng nhập với mật khẩu trong cơ sở dữ liệu
+        return bcrypt.compare(inputPassword, storedPassword);
+    }
+}
+const instance = new AuthService();
 module.exports = {
-    register: register,
-    verifyAccount: verifyAccount,
-    resetPassword: resetPassword,
-    setNewPassword: setNewPassword
+    register,
+    verifyAccount,
+    resetPassword,
+    setNewPassword,
+    authService: instance, // Singleton instance
 };

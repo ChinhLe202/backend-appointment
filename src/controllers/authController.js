@@ -1,6 +1,6 @@
 import { validationResult } from "express-validator";
 import authService from "../services/authService";
-
+const authService2 = require('../services/authService').authService;
 let getLogin = (req, res) => {
     return res.render("auth/login.ejs", {
         error: req.flash("error"),
@@ -91,6 +91,107 @@ let checkLoggedOut = (req, res, next) => {
     }
     next();
 };
+
+let loginApi = async (req, res)=>{
+    try {
+        // Xác thực người dùng
+        const user = await authService2.authenticate(req);
+
+        // Tạo token JWT
+        const token = authService2.generateToken(user);
+
+        // Trả về token và thông tin người dùng
+        res.status(200).json({
+            message: 'Login successful',
+            token: token,
+            user: {
+                id: user.id,
+                email: user.email,
+                role: user.role,
+                status: user.status,
+            },
+        });
+    } catch (error) {
+        res.status(401).json({ message: error.message || 'Login failed' });
+    }
+}
+
+const registerApi = async (req, res) => {
+    try {
+        const { email, password, username } = req.body;
+
+        // Kiểm tra xem email đã tồn tại chưa
+        const existingUser = await userService.findUserByEmail(email);
+        if (existingUser) {
+            return res.status(400).json({ message: 'Email is already in use' });
+        }
+
+        // Mã hóa mật khẩu
+        const hashedPassword = await authService2.hashPassword(password);
+
+        // Tạo người dùng mới
+        const newUser = await userService.createUser({
+            username,
+            email,
+            password: hashedPassword,
+        });
+
+        res.status(201).json({
+            message: 'User registered successfully',
+            user: {
+                id: newUser.id,
+                email: newUser.email,
+            },
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message || 'Registration failed' });
+    }
+};
+
+// Xác minh tài khoản
+const verifyAccountApi = async (req, res) => {
+    try {
+        const { token } = req.params;
+
+        // Xác minh token
+        const result = await authService2.verifyToken(token);
+
+        res.status(200).json({ message: result });
+    } catch (error) {
+        res.status(400).json({ message: error.message || 'Account verification failed' });
+    }
+};
+
+// Reset mật khẩu
+const resetPasswordApi = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        // Tạo link xác minh
+        const linkVerify = `${process.env.CLIENT_URL}/reset-password?token=${authService.generateResetToken(email)}`;
+
+        // Gửi email reset password
+        const result = await authService2.resetPassword(email, linkVerify);
+
+        res.status(200).json({ message: result ? 'Reset email sent' : 'Failed to send reset email' });
+    } catch (error) {
+        res.status(500).json({ message: error.message || 'Reset password failed' });
+    }
+};
+
+// Thiết lập mật khẩu mới
+const setNewPasswordApi = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // Thiết lập mật khẩu mới
+        await authService2.setNewPassword(email, password);
+
+        res.status(200).json({ message: 'Password updated successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message || 'Failed to update password' });
+    }
+};
 module.exports = {
     getLogin: getLogin,
     getRegister: getRegister,
@@ -98,5 +199,10 @@ module.exports = {
     verifyAccount: verifyAccount,
     getLogout: getLogout,
     checkLoggedIn: checkLoggedIn,
-    checkLoggedOut: checkLoggedOut
+    checkLoggedOut: checkLoggedOut,
+    loginApi: loginApi,
+    registerApi: registerApi,
+    verifyAccountApi: verifyAccountApi,
+    resetPasswordApi: resetPasswordApi,
+    setNewPasswordApi: setNewPasswordApi
 };

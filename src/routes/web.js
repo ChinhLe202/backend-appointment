@@ -197,7 +197,19 @@ let initRoutes = (app) => {
     router.post("/admin/statistical", auth.checkLoggedIn, admin.getInfoStatistical);
 
     router.get("/api/chart-count-booking", admin.getDailyBookingStats);
+    router.post('/api/login', auth.loginApi);
 
+    // Đăng ký
+    router.post('/api/register', auth.registerApi);
+
+    // Xác minh tài khoản
+    router.get('/api/verify-account/:token', auth.verifyAccountApi);
+
+    // Gửi email reset mật khẩu
+    router.post('/api/reset-password', auth.resetPasswordApi);
+
+    // Đặt lại mật khẩu
+    router.post('/api/set-new-password', auth.setNewPasswordApi);
     return app.use("/", router);
 };
 module.exports = initRoutes;
