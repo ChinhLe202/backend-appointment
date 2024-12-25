@@ -1,6 +1,10 @@
 import { validationResult } from "express-validator";
 import authService from "../services/authService";
+import userService from "../services/userService";
+import db from "./../models";
 const authService2 = require('../services/authService').authService;
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
 let getLogin = (req, res) => {
     return res.render("auth/login.ejs", {
         error: req.flash("error"),
@@ -96,57 +100,131 @@ let loginApi = async (req, res)=>{
     try {
         // Xác thực người dùng
         const user = await authService2.authenticate(req);
-
+        if (!user) {
+            // Trường hợp không xác thực được
+            return res.status(401).json({
+              status: 'error',
+              message: 'Email hoặc mật khẩu không chính xác.',
+            });
+          }
         // Tạo token JWT
         const token = authService2.generateToken(user);
 
         // Trả về token và thông tin người dùng
         res.status(200).json({
-            message: 'Login successful',
+            message: 'Đăng nhập thành công',
             token: token,
-            user: {
-                id: user.id,
-                email: user.email,
-                role: user.role,
-                status: user.status,
-            },
+            // user: {
+            //     id: user.id,
+            //     email: user.email,
+            //     role: user.role,
+            //     status: user.status,
+            // },
         });
     } catch (error) {
-        res.status(401).json({ message: error.message || 'Login failed' });
+        res.status(401).json({ message: error.message || 'Đăng nhập thất bại' });
     }
 }
 
 const registerApi = async (req, res) => {
     try {
-        const { email, password, username } = req.body;
+        // Validate input data
+        const validationError = validateUser(req.body); // Hàm validate bạn đã sử dụng
+        if (validationError) {
+          return res.status(400).json({
+            message: "Validation error",
+            errors: validationError,
+          });
+        }
 
+        const {
+            name,
+            email,
+            password,
+            address,
+            phone,
+            //avatar,
+            gender,
+            description,
+            roleId,
+            isActive,
+            otpCode
+          } = req.body;
+
+        const verification = await db.EmailVerifications.findOne({
+            where: {
+                email,
+                otp_code: otpCode,
+                expires_at: { [Op.gt]: new Date() }, // Kiểm tra thời hạn
+            },
+            });
+        
+            if (!verification) {
+            return res.status(400).json({ message: "Mã xác nhận không hợp lệ hoặc đã hết hạn." });
+        }
+        
+    
         // Kiểm tra xem email đã tồn tại chưa
         const existingUser = await userService.findUserByEmail(email);
         if (existingUser) {
-            return res.status(400).json({ message: 'Email is already in use' });
+          return res.status(400).json({ message: "Email đã được sử dụng." });
         }
-
+    
         // Mã hóa mật khẩu
-        const hashedPassword = await authService2.hashPassword(password);
-
-        // Tạo người dùng mới
+        //const hashedPassword = await authService.hashPassword(password);
+    
+        // Tạo user qua service
         const newUser = await userService.createUser({
-            username,
-            email,
-            password: hashedPassword,
+          name,
+          email,
+          password: password, // Lưu mật khẩu đã hash
+          address,
+          phone,
+          //avatar,
+          gender,
+          description,
+          roleId,
+          isActive: isActive || 1,
         });
-
-        res.status(201).json({
-            message: 'User registered successfully',
-            user: {
-                id: newUser.id,
-                email: newUser.email,
-            },
+    
+        return res
+          .status(201)
+          .json({ message: "Đăng kí thành công.", data: newUser });
+      } catch (error) {
+        console.error("Lỗi khi tạo user:", error);
+        return res.status(500).json({
+          message: "Có lỗi xảy ra.",
+          error: error.message || "Đã xảy ra lỗi trong quá trình xử lý.",
         });
-    } catch (error) {
-        res.status(500).json({ message: error.message || 'Registration failed' });
-    }
+      }
 };
+
+const sendVerificationCode = async (req, res) => {
+    try {
+      const { email } = req.body;
+  
+      // Kiểm tra email đã tồn tại trong hệ thống chưa
+      const existingUser = await userService.findUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ message: "Email đã được sử dụng." });
+      }
+  
+      // Tạo mã OTP
+      const otpCode = await authService2.generateOTP();
+      const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 phút
+      console.log(otpCode, expiresAt);
+      // Lưu mã OTP vào DB
+      await db.EmailVerifications.create({ email, otp_code: otpCode, expires_at: expiresAt });
+  
+      // Gửi email OTP
+      await authService2.sendVerificationEmail(email, otpCode);
+  
+      res.status(200).json({ message: "Mã xác nhận đã được gửi đến email của bạn." });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Gửi mã xác nhận thất bại.", error: error.message });
+    }
+  };
 
 // Xác minh tài khoản
 const verifyAccountApi = async (req, res) => {
@@ -192,6 +270,28 @@ const setNewPasswordApi = async (req, res) => {
         res.status(500).json({ message: error.message || 'Failed to update password' });
     }
 };
+
+const validateUser = (data) => {
+    const errors = [];
+  
+    if (!data.name || data.name.trim() === "") {
+      errors.push("Vui lòng nhập tên.");
+    }
+  
+    if (!data.email || !/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(data.email)) {
+      errors.push("Định dạng email không đúng.");
+    }
+  
+    if (!data.password || data.password.length < 6) {
+      errors.push("Mật khẩu cần dài hơn 6 kí tự.");
+    }
+  
+    if (data.phone && !/^(03|05|07|08|09)\d{8}$/.test(data.phone)) {
+        errors.push("Định dạng số điện thoại Việt Nam chưa đúng.");
+    }
+  
+    return errors.length > 0 ? errors : null;
+  };
 module.exports = {
     getLogin: getLogin,
     getRegister: getRegister,
@@ -204,5 +304,6 @@ module.exports = {
     registerApi: registerApi,
     verifyAccountApi: verifyAccountApi,
     resetPasswordApi: resetPasswordApi,
-    setNewPasswordApi: setNewPasswordApi
+    setNewPasswordApi: setNewPasswordApi,
+    sendVerificationCode: sendVerificationCode
 };

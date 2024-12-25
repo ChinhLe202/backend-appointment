@@ -344,6 +344,20 @@ let getAllDoctorsSchedule = () => {
         }
     })
 }
+
+const createUser = async (userData) => {
+    try {
+      userData.password = bcrypt.hashSync(userData.password, salt);
+      const newUser = await db.User.create({
+        ...userData,
+        createdAt: new Date(),
+        //updatedAt: new Date(),
+      });
+      return newUser;
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };
 module.exports = {
     createDoctor: createDoctor,
     getInfoDoctors: getInfoDoctors,
@@ -354,5 +368,6 @@ module.exports = {
     getInfoDoctorChart: getInfoDoctorChart,
     createAllDoctorsSchedule: createAllDoctorsSchedule,
     getAllDoctorsSchedule: getAllDoctorsSchedule,
-    getInfoDoctorsFilter: getInfoDoctorsFilter
+    getInfoDoctorsFilter: getInfoDoctorsFilter,
+    createUser: createUser
 };

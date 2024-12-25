@@ -202,6 +202,8 @@ let initRoutes = (app) => {
     // Đăng ký
     router.post('/api/register', auth.registerApi);
 
+    router.post('/api/mail-verifycation', auth.sendVerificationCode);
+
     // Xác minh tài khoản
     router.get('/api/verify-account/:token', auth.verifyAccountApi);
 

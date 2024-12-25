@@ -1,5 +1,7 @@
+import { address } from "faker/lib/locales/az";
 import {tranRegisterEmail, tranForgotPassword} from "../../lang/en";
 import {sendEmail} from "./../config/mailer";
+import mailer from "./../config/mailer";
 import userService from "./../services/userService";
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
@@ -69,6 +71,10 @@ class AuthService {
     generateToken(user) {
         const payload = {
             id: user.id,
+            name: user.name,
+            address: user.address,
+            phone: user.phone,
+            gender: user.gender,
             email: user.email,
             role: user.roleId || 0, // Thêm vai trò (mặc định là user)
             status: user.isActive || 0 // Thêm trạng thái (mặc định là active)
@@ -80,6 +86,25 @@ class AuthService {
         // So sánh mật khẩu người dùng nhập với mật khẩu trong cơ sở dữ liệu
         return bcrypt.compare(inputPassword, storedPassword);
     }
+
+    async generateOTP(){
+        return Math.floor(100000 + Math.random() * 900000).toString(); // 6 chữ số
+    };
+
+    async sendVerificationEmail (email, otpCode) {
+        const mailOptions = {
+          from: '"Your App" <your-email@gmail.com>',
+          to: email,
+          subject: "Xác nhận email của bạn",
+          html: `
+            <p>Xin chào,</p>
+            <p>Mã xác nhận của bạn là:</p>
+            <h2>${otpCode}</h2>
+            <p>Mã có hiệu lực trong 10 phút.</p>
+          `,
+        };
+        await mailer.sendEmailNormal(email,"Mã OTP xác nhận đăng kí tài khoản", mailOptions.html);
+    };
 }
 const instance = new AuthService();
 module.exports = {

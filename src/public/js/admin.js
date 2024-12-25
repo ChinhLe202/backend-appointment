@@ -338,7 +338,7 @@ function deleteDoctorById() {
 
 function showModalInfoDoctor() {
     $('.show-doctor-info').on('click', function(e) {
-        e.preventDefault();
+        e.prefentDefault();
         let id = $(this).data('doctor-id');
 
         $.ajax({
