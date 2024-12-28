@@ -101,6 +101,7 @@ let getForPatientsTabs = async (req, res) => {
 
 let postChangeStatusPatient = async (req, res) => {
     try {
+        console.log(req.body);
         let id = req.body.patientId;
         let status = req.body.status;
         let statusId = '';
@@ -111,7 +112,7 @@ let postChangeStatusPatient = async (req, res) => {
         } else if (status === 'failed') {
             statusId = statusFailedId;
             if (req.body.reason) {
-                content = `Cancel with reason - ${req.body.reason}`;
+                content = `${req.body.reason}`;
             }
 
         } else if (status === 'confirmed') {

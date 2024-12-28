@@ -183,7 +183,7 @@ let getInfoBookingPage = async (req, res) => {
 let postBookingDoctorPageWithoutFiles = async (req, res) => {
     try {
         let item = req.body;
-        item.statusId = statusNewId;
+        item.statusId = statusPendingId;
         item.historyBreath = req.body.breath;
         item.moreInfo = req.body.extraOldForms;
         if (item.places === 'none') item.placeId = 0;

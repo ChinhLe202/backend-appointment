@@ -156,6 +156,7 @@ let initRoutes = (app) => {
     router.post('/api/get-info-doctor-by-id', doctor.getInfoDoctorById);
     router.post('/api/get-info-clinic-by-id', clinic.getInfoClinicById);
     router.post('/api/get-detail-patient-by-id', home.getDetailPatientBooking);
+    router.post('/api/supporter/change-status-patient', auth.checkAuthWithJWT,supporter.postChangeStatusPatient);
 
     router.delete('/admin/delete/clinic', auth.checkLoggedIn, admin.deleteClinicById);
     router.delete('/admin/delete/doctor', auth.checkLoggedIn, admin.deleteDoctorById);

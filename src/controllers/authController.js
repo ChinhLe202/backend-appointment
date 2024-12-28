@@ -2,6 +2,7 @@ import { validationResult } from "express-validator";
 import authService from "../services/authService";
 import userService from "../services/userService";
 import db from "./../models";
+const jwt = require('jsonwebtoken');
 const authService2 = require('../services/authService').authService;
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
@@ -292,6 +293,24 @@ const validateUser = (data) => {
   
     return errors.length > 0 ? errors : null;
   };
+
+  const checkAuthWithJWT = (req, res, next) => {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ message: 'Authorization token missing or invalid' });
+    }
+
+    const token = authHeader.split(' ')[1]; // Lấy token sau "Bearer"
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET); // Dùng secret để xác minh
+        req.user = decoded; // Lưu thông tin user từ token vào req.user
+        next(); // Tiếp tục xử lý route
+    } catch (error) {
+        return res.status(403).json({ message: 'Invalid or expired token' });
+    }
+};
 module.exports = {
     getLogin: getLogin,
     getRegister: getRegister,
@@ -305,5 +324,6 @@ module.exports = {
     verifyAccountApi: verifyAccountApi,
     resetPasswordApi: resetPasswordApi,
     setNewPasswordApi: setNewPasswordApi,
-    sendVerificationCode: sendVerificationCode
+    sendVerificationCode: sendVerificationCode,
+    checkAuthWithJWT: checkAuthWithJWT
 };

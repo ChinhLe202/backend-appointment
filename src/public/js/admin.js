@@ -736,20 +736,20 @@ function loadNewPatientsForSupporter() {
             $('#count-canceled').text(`${countCanceled}`);
 
             let htmlNew, htmlPending, htmlConfirmed, htmlCanceled = '';
-            data.object.newPatients.forEach((patient) => {
-                htmlNew += `
-                <tr>
-                    <td> ${patient.id} - ${patient.name}   </td>
-                    <td> ${patient.phone}     </td>
-                    <td> ${patient.email}     </td>
-                    <td>${convertStringToDateClient(patient.updatedAt)}      </td>
-                    <td> 
-                    <button type="button"  data-patient-id="${patient.id}" class="ml-3 btn btn-primary btn-new-patient-ok"> Xác nhận</button>
-                    <button  type="button" data-patient-id="${patient.id}" class="ml-3 btn btn-danger btn-new-patient-cancel"> Hủy </button>
-                    </td>
-                </tr>
-                `;
-            });
+            // data.object.newPatients.forEach((patient) => {
+            //     htmlNew += `
+            //     <tr>
+            //         <td> ${patient.id} - ${patient.name}   </td>
+            //         <td> ${patient.phone}     </td>
+            //         <td> ${patient.email}     </td>
+            //         <td>${convertStringToDateClient(patient.updatedAt)}      </td>
+            //         <td> 
+            //         <button type="button"  data-patient-id="${patient.id}" class="ml-3 btn btn-primary btn-new-patient-ok"> Xác nhận</button>
+            //         <button  type="button" data-patient-id="${patient.id}" class="ml-3 btn btn-danger btn-new-patient-cancel"> Hủy </button>
+            //         </td>
+            //     </tr>
+            //     `;
+            // });
 
             data.object.pendingPatients.forEach((patient) => {
                 htmlPending += `
