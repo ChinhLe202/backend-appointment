@@ -358,6 +358,28 @@ const createUser = async (userData) => {
       throw new Error(error.message);
     }
   };
+
+  async function setNewPassword(email, newPassword) {
+    try {
+        // Kiểm tra email có tồn tại không
+        console.log(email, newPassword);
+        let user = await db.User.findOne({
+            where: { email: email },
+        });
+        if (!user) {
+            return { success: false, message: 'Email không tồn tại' };
+        }
+
+        // Cập nhật mật khẩu mới
+        user.password = newPassword;
+        await user.save();
+
+        return { success: true, message: 'Mật khẩu đã được cập nhật thành công' };
+    } catch (error) {
+        console.error('Lỗi khi cập nhật mật khẩu:', error);
+        return { success: false, message: 'Đã xảy ra lỗi khi cập nhật mật khẩu' };
+    }
+}
 module.exports = {
     createDoctor: createDoctor,
     getInfoDoctors: getInfoDoctors,
@@ -369,5 +391,6 @@ module.exports = {
     createAllDoctorsSchedule: createAllDoctorsSchedule,
     getAllDoctorsSchedule: getAllDoctorsSchedule,
     getInfoDoctorsFilter: getInfoDoctorsFilter,
-    createUser: createUser
+    createUser: createUser,
+    setNewPassword: setNewPassword
 };

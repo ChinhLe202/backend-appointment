@@ -311,6 +311,21 @@ const validateUser = (data) => {
         return res.status(403).json({ message: 'Invalid or expired token' });
     }
 };
+
+const changePassword = async (req, res) => {
+    console.log(req.body);
+    const { email, currentPassword, newPassword } = req.body;
+    try {
+        // Gọi service đổi mật khẩu
+        const result = await authService.changePassword(email, currentPassword, newPassword);
+        console.log(result);
+        // Trả về thông báo thành công
+        res.status(200).send({ message: result });
+    } catch (error) {
+        // Trả về thông báo lỗi nếu có lỗi xảy ra
+        res.status(400).send({ message: error });
+    }
+};
 module.exports = {
     getLogin: getLogin,
     getRegister: getRegister,
@@ -325,5 +340,6 @@ module.exports = {
     resetPasswordApi: resetPasswordApi,
     setNewPasswordApi: setNewPasswordApi,
     sendVerificationCode: sendVerificationCode,
-    checkAuthWithJWT: checkAuthWithJWT
+    checkAuthWithJWT: checkAuthWithJWT,
+    changePassword: changePassword
 };

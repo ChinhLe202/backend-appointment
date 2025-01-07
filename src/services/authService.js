@@ -42,10 +42,35 @@ let setNewPassword = (email, password) => {
             .then(async (user) => {
                 if (!user) reject("user not found");
                 else {
-                    await userService.setNewPassword(user._id, password);
+                    await userService.setNewPassword(email, password);
                     resolve(true);
                 }
             }).catch((err) => {
+                reject(err);
+            });
+    });
+};
+
+let changePassword = (email, currentPassword, newPassword) => {
+    return new Promise(async (resolve, reject) => {
+        await userService.findUserByEmail(email)
+            .then(async (user) => {
+                if (!user) {
+                    reject("Không tìm thấy tài khoản");
+                } else {
+                    // Kiểm tra mật khẩu hiện tại với mật khẩu đã lưu trong cơ sở dữ liệu
+                    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+                    if (!isPasswordValid) {
+                        reject("Mật khẩu hiện tại không chính xác");
+                    } else {
+                        // Mã hóa lại mật khẩu mới trước khi lưu vào cơ sở dữ liệu
+                        const hashedPassword = await bcrypt.hash(newPassword, 7);
+                        await setNewPassword(email , hashedPassword);
+                        resolve("Mật khẩu đã được thay đổi thành công");
+                    }
+                }
+            }).catch((err) => {
+                console.log(err)
                 reject(err);
             });
     });
@@ -66,6 +91,16 @@ class AuthService {
                 resolve(user);
             })(req);
         });
+    }
+
+    async changePassword(email,currentPassword,newPassword ) {
+        try {
+            const result = await changePassword(email, currentPassword, newPassword);
+            console.log(result);
+            res.status(200).send({ message: result });
+        } catch (error) {
+            res.status(400).send({ message: error });
+        }
     }
 
     generateToken(user) {
@@ -112,5 +147,6 @@ module.exports = {
     verifyAccount,
     resetPassword,
     setNewPassword,
+    changePassword,
     authService: instance, // Singleton instance
 };

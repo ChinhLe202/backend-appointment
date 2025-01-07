@@ -164,6 +164,7 @@ let initRoutes = (app) => {
     router.delete('/admin/delete/post', auth.checkLoggedIn, admin.deletePostById);
 
     router.get("/login", auth.checkLoggedOut, auth.getLogin);
+    router.post('/api/change-password', auth.checkAuthWithJWT,auth.changePassword);
 
     router.post('/login', function(req, res, next) {
         passport.authenticate('local', function(err, user, info) {
