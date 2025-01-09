@@ -347,6 +347,7 @@ let getAllDoctorsSchedule = () => {
 
 const createUser = async (userData) => {
     try {
+      const salt = await bcrypt.genSalt(10);
       userData.password = bcrypt.hashSync(userData.password, salt);
       const newUser = await db.User.create({
         ...userData,

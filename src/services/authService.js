@@ -64,7 +64,8 @@ let changePassword = (email, currentPassword, newPassword) => {
                         reject("Mật khẩu hiện tại không chính xác");
                     } else {
                         // Mã hóa lại mật khẩu mới trước khi lưu vào cơ sở dữ liệu
-                        const hashedPassword = await bcrypt.hash(newPassword, 7);
+                        const salt = await bcrypt.genSalt(10);
+                        const hashedPassword = await bcrypt.hash(newPassword, salt);
                         await setNewPassword(email , hashedPassword);
                         resolve("Mật khẩu đã được thay đổi thành công");
                     }
