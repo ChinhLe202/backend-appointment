@@ -148,7 +148,7 @@ let initRoutes = (app) => {
     router.get('/supporter/manage/post/create', auth.checkLoggedIn, supporter.getCreatePost);
     router.post('/supporter/manage/post/create', auth.checkLoggedIn, supporter.postCreatePost);
     router.get('/supporter/get-list-posts', auth.checkLoggedIn, supporter.getAllPosts);
-    router.post('/supporter/get-patients-for-tabs', auth.checkLoggedIn, supporter.getForPatientsTabs);
+    router.post('/supporter/get-patients-for-tabs', auth.checkLoggedIn, supporter.getForPatientsTabs); 
     router.post('/supporter/change-status-patient', auth.checkLoggedIn, supporter.postChangeStatusPatient);
     router.post('/supporter/get-logs-patient', auth.checkLoggedIn, supporter.getLogsPatient);
     router.post('/supporter/done-comment', auth.checkLoggedIn, supporter.postDoneComment);
