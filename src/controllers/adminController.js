@@ -8,7 +8,8 @@ import doctorService from "./../services/doctorService";
 import chatFBServie from "./../services/chatFBService";
 import multer from "multer";
 
-let getManageDoctor = async (req, res) => {
+// Quản lý bác sĩ
+let getManageDoctor = async(req, res) => {
     let doctors = await userService.getInfoDoctors();
     return res.render("main/users/admins/manageDoctor.ejs", {
         user: req.user,
@@ -16,7 +17,8 @@ let getManageDoctor = async (req, res) => {
     });
 };
 
-let getManageClinic = async (req, res) => {
+//Quản lý phòng khám
+let getManageClinic = async(req, res) => {
     let clinics = await homeService.getClinics();
     return res.render("main/users/admins/manageClinic.ejs", {
         user: req.user,
@@ -24,7 +26,8 @@ let getManageClinic = async (req, res) => {
     });
 };
 
-let getCreateDoctor = async (req, res) => {
+// Lấy danh sách thêm bác sĩ
+let getCreateDoctor = async(req, res) => {
     let clinics = await homeService.getClinics();
     let specializations = await homeService.getSpecializations();
     return res.render("main/users/admins/createDoctor.ejs", {
@@ -33,7 +36,9 @@ let getCreateDoctor = async (req, res) => {
         specializations: specializations
     });
 };
-let postCreateDoctor = async (req, res) => {
+
+//Thêm bác sĩ
+let postCreateDoctor = async(req, res) => {
     let doctor = {
         'name': req.body.name,
         'phone': req.body.phone,
@@ -54,6 +59,8 @@ let postCreateDoctor = async (req, res) => {
     }
 };
 
+
+//Lấy danh sách thêm phòng khám
 let getCreateClinic = (req, res) => {
     return res.render("main/users/admins/createClinic.ejs", {
         user: req.user
@@ -61,7 +68,8 @@ let getCreateClinic = (req, res) => {
 };
 
 
-let postCreateClinic = async (req, res) => {
+//Thêm phòng khám
+let postCreateClinic = async(req, res) => {
     // imageClinicUploadFile(req, res, async (err) => {
     //     if (err) {
     //         console.log(err);
@@ -74,25 +82,27 @@ let postCreateClinic = async (req, res) => {
     //         }
     //     }
 
-        try {
-            let item = req.body;
-            if (req.body.avatar) {
-                let base64Image = req.body.avatar;
-                item.image = base64Image;
-            };
-            let clinic = await clinicService.createNewClinic(item);
-            return res.status(200).json({
-                message: 'success',
-                clinic: clinic
-            });
+    try {
+        let item = req.body;
+        if (req.body.avatar) {
+            let base64Image = req.body.avatar;
+            item.image = base64Image;
+        };
+        let clinic = await clinicService.createNewClinic(item);
+        return res.status(200).json({
+            message: 'success',
+            clinic: clinic
+        });
 
-        } catch (e) {
-            console.log(e);
-            return res.status(500).send(e);
-        }
+    } catch (e) {
+        console.log(e);
+        return res.status(500).send(e);
+    }
     //});
 };
 
+
+// Lưu ảnh vào thư mục
 let storageImageClinic = multer.diskStorage({
     destination: (req, file, callback) => {
         callback(null, "src/public/images/clinics");
@@ -108,7 +118,7 @@ let imageClinicUploadFile = multer({
     limits: { fileSize: 1048576 * 20 }
 }).single("image");
 
-let postCreateClinicWithoutFile = async (req, res) => {
+let postCreateClinicWithoutFile = async(req, res) => {
     try {
         let clinic = await clinicService.createNewClinic(req.body);
         return res.status(200).json({
@@ -121,7 +131,8 @@ let postCreateClinicWithoutFile = async (req, res) => {
     }
 };
 
-let deleteClinicById = async (req, res) => {
+//Xóa phòng khám
+let deleteClinicById = async(req, res) => {
     try {
         let clinic = await clinicService.deleteClinicById(req.body.id);
         return res.status(200).json({
@@ -134,7 +145,8 @@ let deleteClinicById = async (req, res) => {
     }
 };
 
-let getEditClinic = async (req, res) => {
+//Lấy thông tin edit phòng khám
+let getEditClinic = async(req, res) => {
     let clinic = await clinicService.getClinicById(req.params.id);
     return res.render("main/users/admins/editClinic.ejs", {
         user: req.user,
@@ -142,7 +154,8 @@ let getEditClinic = async (req, res) => {
     });
 };
 
-let putUpdateClinicWithoutFile = async (req, res) => {
+//Edit phòng khám(ko có ảnh)
+let putUpdateClinicWithoutFile = async(req, res) => {
     try {
         let clinic = await clinicService.updateClinic(req.body);
         return res.status(200).json({
@@ -155,7 +168,8 @@ let putUpdateClinicWithoutFile = async (req, res) => {
     }
 };
 
-let putUpdateClinic = async (req, res) => {
+//Edit phòng khám(có ảnh)
+let putUpdateClinic = async(req, res) => {
     // imageClinicUploadFile(req, res, async (err) => {
     //     if (err) {
     //         console.log(err);
@@ -168,28 +182,29 @@ let putUpdateClinic = async (req, res) => {
     //         }
     //     }
 
-        try {
-            let item = req.body;
-            //let imageClinic = req.file;
-            if (req.body.avatar) {
-                let base64Image = req.body.avatar;
-                item.image = base64Image;
-            };
-            //item.image = imageClinic.filename;
-            let clinic = await clinicService.updateClinic(item);
-            return res.status(200).json({
-                message: 'update clinic successful',
-                clinic: clinic
-            });
+    try {
+        let item = req.body;
+        //let imageClinic = req.file;
+        if (req.body.avatar) {
+            let base64Image = req.body.avatar;
+            item.image = base64Image;
+        };
+        //item.image = imageClinic.filename;
+        let clinic = await clinicService.updateClinic(item);
+        return res.status(200).json({
+            message: 'update clinic successful',
+            clinic: clinic
+        });
 
-        } catch (e) {
-            console.log(e);
-            return res.status(500).send(e);
-        }
+    } catch (e) {
+        console.log(e);
+        return res.status(500).send(e);
+    }
     //});
 };
 
-let getSpecializationPage = async (req, res) => {
+//Lấy danh sách chuyên khoa
+let getSpecializationPage = async(req, res) => {
     let specializations = await specializationService.getAllSpecializations();
     return res.render("main/users/admins/manageSpecialization.ejs", {
         user: req.user,
@@ -197,7 +212,8 @@ let getSpecializationPage = async (req, res) => {
     });
 };
 
-let deleteDoctorById = async (req, res) => {
+//Xóa bác sĩ
+let deleteDoctorById = async(req, res) => {
     try {
         let doctor = await doctorService.deleteDoctorById(req.body.id);
         return res.status(200).json({
@@ -210,7 +226,8 @@ let deleteDoctorById = async (req, res) => {
     }
 };
 
-let getEditDoctor = async (req, res) => {
+//Lấy thông tin bác sĩ
+let getEditDoctor = async(req, res) => {
     let doctor = await doctorService.getDoctorForEditPage(req.params.id);
     let clinics = await homeService.getClinics();
     let specializations = await homeService.getSpecializations();
@@ -222,7 +239,8 @@ let getEditDoctor = async (req, res) => {
     })
 };
 
-let putUpdateDoctorWithoutFile = async (req, res) => {
+//Edit thông tin bác sĩ(ko có ảnh)
+let putUpdateDoctorWithoutFile = async(req, res) => {
     try {
         let item = {
             id: req.body.id,
@@ -243,6 +261,7 @@ let putUpdateDoctorWithoutFile = async (req, res) => {
     }
 };
 
+//Edit thông tin bác sĩ(có ảnh)
 let putUpdateDoctor = (req, res) => {
     // imageDoctorUploadFile(req, res, async (err) => {
     //     // if (err) {
@@ -252,9 +271,9 @@ let putUpdateDoctor = (req, res) => {
     //     //         return res.status(500).send(err);
     //     //     }
     //     // }
-        
 
-        
+
+
     // });
     try {
         let item = {
@@ -300,7 +319,7 @@ let putUpdateDoctor = (req, res) => {
 //             let base64Image = req.body.avatar;
 //             item.avatar = base64Image;
 //         }
-        
+
 //         // Cập nhật thông tin bác sĩ
 //         let doctor = await doctorService.updateDoctorInfo(item);
 
@@ -329,7 +348,7 @@ let imageDoctorUploadFile = multer({
     limits: { fileSize: 1048576 * 20 }
 }).single("avatar");
 
-let getSupporterPage = async (req, res) => {
+let getSupporterPage = async(req, res) => {
     let supporters = await supporterService.getAllSupporters();
     return res.render("main/users/admins/manageSupporter.ejs", {
         user: req.user,
@@ -337,7 +356,7 @@ let getSupporterPage = async (req, res) => {
     })
 };
 
-let deleteSpecializationById = async (req, res) => {
+let deleteSpecializationById = async(req, res) => {
     try {
         await specializationService.deleteSpecializationById(req.body.id);
         return res.status(200).json({
@@ -351,23 +370,23 @@ let deleteSpecializationById = async (req, res) => {
 
 };
 
-let getManageBotPage = async (req, res) => {
+let getManageBotPage = async(req, res) => {
     try {
         return res.send("Hello word. You'll need a witAI account. More info: please comment on my youtube channel.")
-        // let entities = await chatFBServie.getWitEntitiesWithExpression();
-        // let entityName = await chatFBServie.getWitEntities();
-        // return res.render('main/users/admins/manageBot.ejs', {
-        //     user: req.user,
-        //     entities: entities,
-        //     entityName: entityName
-        // });
+            // let entities = await chatFBServie.getWitEntitiesWithExpression();
+            // let entityName = await chatFBServie.getWitEntities();
+            // return res.render('main/users/admins/manageBot.ejs', {
+            //     user: req.user,
+            //     entities: entities,
+            //     entityName: entityName
+            // });
     } catch (e) {
         console.log(e);
     }
 
 };
 
-let deletePostById = async (req, res) => {
+let deletePostById = async(req, res) => {
     try {
         await supporterService.deletePostById(req.body.id);
         return res.status(200).json({
@@ -379,7 +398,7 @@ let deletePostById = async (req, res) => {
     }
 };
 
-let getEditPost = async (req, res) => {
+let getEditPost = async(req, res) => {
     try {
         let clinics = await homeService.getClinics();
         let doctors = await userService.getInfoDoctors();
@@ -398,7 +417,7 @@ let getEditPost = async (req, res) => {
     }
 };
 
-let putUpdatePost = async (req, res) => {
+let putUpdatePost = async(req, res) => {
     try {
         let data = {
             id: req.body.id,
@@ -422,7 +441,7 @@ let putUpdatePost = async (req, res) => {
     }
 };
 
-let getManageCreateScheduleForDoctorsPage = async (req, res) => {
+let getManageCreateScheduleForDoctorsPage = async(req, res) => {
     try {
         return res.render('main/users/admins/manageScheduleForDoctors.ejs', {
             user: req.user,
@@ -433,7 +452,7 @@ let getManageCreateScheduleForDoctorsPage = async (req, res) => {
 
 };
 
-let getInfoStatistical = async (req, res) => {
+let getInfoStatistical = async(req, res) => {
     try {
         let month = req.body.month;
         let object = await userService.getInfoStatistical(month);
@@ -444,7 +463,7 @@ let getInfoStatistical = async (req, res) => {
     }
 };
 
-const getDailyBookingStats = async (req, res) => {
+const getDailyBookingStats = async(req, res) => {
     let month = req.query.month;
     let year = 2024;
     try {
@@ -484,5 +503,5 @@ module.exports = {
     deleteSpecializationById: deleteSpecializationById,
     deletePostById: deletePostById,
 
-    getDailyBookingStats:getDailyBookingStats
+    getDailyBookingStats: getDailyBookingStats
 };

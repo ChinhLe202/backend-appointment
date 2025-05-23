@@ -15,44 +15,49 @@ let app = express();
 app.use(methodOverride('_method'));
 app.use(cookieParser('secret'));
 app.use(flash());
-app.use(bodyParser.json({limit: '100mb'}));
-app.use(bodyParser.urlencoded({limit: '100mb', extended: true}));
+app.use(bodyParser.json({ limit: '100mb' }));
+app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
 
 // Config CORS with multiple origins
-const allowedOrigins = ['http://localhost:8080', 'http://192.168.1.8:8081'];
+const allowedOrigins = [
+    'http://localhost:8080',
+    'http://172.16.125.26:8081',
+    'http://192.168.1.3:8081',
+    'http://172.16.223.21:8081'
+];
 
 app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true); // Allow access
-      } else {
-        callback(new Error('Not allowed by CORS')); // Deny access
-      }
-    },
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
-  })
+    cors({
+        origin: (origin, callback) => {
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true); // Allow access
+            } else {
+                callback(new Error('Not allowed by CORS')); // Deny access
+            }
+        },
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        credentials: true,
+    })
 );
 
 // Handle CORS errors
 app.use((err, req, res, next) => {
-  if (err instanceof Error && err.message === 'Not allowed by CORS') {
-    return res.status(403).json({error: 'CORS not allowed for this origin'});
-  }
-  next(err);
+    if (err instanceof Error && err.message === 'Not allowed by CORS') {
+        return res.status(403).json({ error: 'CORS not allowed for this origin' });
+    }
+    next(err);
 });
 
 // Config rate limiting
 const limiter = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 phút
-  max: 100, // Tối đa 100 yêu cầu mỗi IP trong 1 phút
-  message: {
-    error: 'Too many requests from this IP, please try again after 1 minutes',
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
+    windowMs: 1 * 60 * 1000, // 1 phút
+    max: 100, // Tối đa 100 yêu cầu mỗi IP trong 1 phút
+    message: {
+        error: 'Too many requests from this IP, please try again after 1 minutes',
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
 });
 
 // Áp dụng rate limiting cho toàn bộ ứng dụng
@@ -74,5 +79,5 @@ initRoutes(app);
 // Start the server
 let port = process.env.PORT || 8080;
 app.listen(port, () =>
-  console.log(`Doctors care app is running on port ${port}!`)
+    console.log(`Doctors care app is running on port ${port}!`)
 );

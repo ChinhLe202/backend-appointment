@@ -10,22 +10,25 @@ const statusSuccessId = 1;
 const statusNewId = 4;
 const { Op, fn, col, literal } = require('sequelize');
 
+//Lấy thông tin đặt lịch một bệnh nhân theo ID, bao gồm thông tin bác sĩ liên quan
 let getInfoBooking = (id) => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
         try {
             let patient = await db.Patient.findOne({
                 where: { id: id },
-                attributes: [ 'id', 'doctorId' ]
+                attributes: ['id', 'doctorId']
             });
 
             if (!patient) {
                 reject(`Can't get patient with id = ${id}`);
             }
+            //Lấy thông tin bác sĩ tương ứng
             let doctor = await db.User.findOne({
                 where: { id: patient.doctorId },
-                attributes: [ 'name', 'avatar' ]
+                attributes: ['name', 'avatar']
             });
 
+            //Thêm thông tin bác sĩ tương ứng vào dữ liệu bệnh nhân
             patient.setDataValue('doctorName', doctor.name);
             patient.setDataValue('doctorAvatar', doctor.avatar);
             resolve(patient);
@@ -35,35 +38,44 @@ let getInfoBooking = (id) => {
     });
 };
 
+//Lấy danh sách bệnh nhân theo từng trạng thái (mới, chờ xác nhận, xác nhận, hủy)
 let getForPatientsTabs = () => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
         try {
             let newPatients = await db.Patient.findAll({
                 where: {
                     statusId: statusNewId
                 },
-                order: [ [ 'updatedAt', 'DESC' ] ],
+                order: [
+                    ['updatedAt', 'DESC']
+                ],
             });
 
             let pendingPatients = await db.Patient.findAll({
                 where: {
                     statusId: statusPendingId
                 },
-                order: [ [ 'updatedAt', 'DESC' ] ],
+                order: [
+                    ['updatedAt', 'DESC']
+                ],
             });
 
             let confirmedPatients = await db.Patient.findAll({
                 where: {
                     statusId: statusSuccessId
                 },
-                order: [ [ 'updatedAt', 'DESC' ] ],
+                order: [
+                    ['updatedAt', 'DESC']
+                ],
             });
 
             let canceledPatients = await db.Patient.findAll({
                 where: {
                     statusId: statusFailedId
                 },
-                order: [ [ 'updatedAt', 'DESC' ] ],
+                order: [
+                    ['updatedAt', 'DESC']
+                ],
             });
 
             resolve({
@@ -78,8 +90,9 @@ let getForPatientsTabs = () => {
     });
 };
 
+//Thay đổi trạng thái của lịch đặt khám (xác nhận, hủy) và gửi email thông báo
 let changeStatusPatient = (data, logs) => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
         try {
 
             let patient = await db.Patient.findOne({
@@ -88,7 +101,7 @@ let changeStatusPatient = (data, logs) => {
 
             let doctor = await db.User.findOne({
                 where: { id: patient.doctorId },
-                attributes: [ 'name', 'avatar' ],
+                attributes: ['name', 'avatar'],
             });
 
 
@@ -112,7 +125,7 @@ let changeStatusPatient = (data, logs) => {
                 await schedule.update({ sumBooking: sum - 1 });
             }
 
-
+            //Cập nhật trạng thái bệnh nhân
             await patient.update(data);
 
             //update logs
@@ -144,14 +157,15 @@ let changeStatusPatient = (data, logs) => {
     });
 };
 
-let isBookAble = async (doctorId, date, time) => {
+//Kiểm tra xem bác sĩ còn khả năng nhận thêm lịch khám ở khung giờ cụ thể hay ko
+let isBookAble = async(doctorId, date, time) => {
     let schedule = await db.Schedule.findOne({
         where: {
             doctorId: doctorId,
             date: date,
             time: time
         },
-        attributes: [ 'id', 'doctorId', 'date', 'time', 'maxBooking', 'sumBooking' ]
+        attributes: ['id', 'doctorId', 'date', 'time', 'maxBooking', 'sumBooking']
     });
 
     if (schedule) {
@@ -160,8 +174,9 @@ let isBookAble = async (doctorId, date, time) => {
     return false;
 };
 
+//Tạo lịch khám mới cho bệnh nhân, kiểm tra khả năng đặt lịch, cập nhật số lượng, gửi email
 let createNewPatient = (data) => {
-    return new Promise((async (resolve, reject) => {
+    return new Promise((async(resolve, reject) => {
         try {
             console.log(data.doctorId, data.dateBooking, data.timeBooking)
             let schedule = await db.Schedule.findOne({
@@ -170,21 +185,23 @@ let createNewPatient = (data) => {
                     date: data.dateBooking,
                     time: data.timeBooking
                 },
-            }).then(async (schedule) => {
+            }).then(async(schedule) => {
                 if (schedule && schedule.sumBooking < schedule.maxBooking) {
                     let patient = await db.Patient.create(data);
                     data.patientId = patient.id;
+                    //Cập nhật mã bệnh nhân sau khi tạo
                     await db.Patient.update({ patientId: patient.id }, { where: { id: patient.id } });
-                    
+
                     //await db.ExtraInfo.create(data);
 
                     //tăng sumBooking
                     let sum = +schedule.sumBooking;
                     await schedule.update({ sumBooking: sum + 1 });
 
+                    //Lấy thông tin bác sĩ 
                     let doctor = await db.User.findOne({
                         where: { id: patient.doctorId },
-                        attributes: [ 'name', 'avatar' ]
+                        attributes: ['name', 'avatar']
                     });
 
                     //update logs
@@ -196,6 +213,7 @@ let createNewPatient = (data) => {
 
                     await db.SupporterLog.create(logs);
 
+                    //Gửi mail xác nhận
                     let dataSend = {
                         time: patient.timeBooking,
                         date: patient.dateBooking,
@@ -221,8 +239,9 @@ let createNewPatient = (data) => {
     }));
 };
 
+//Lấy chi tiết thông tin bệnh nhân theo ID, bao gồm cả thông tin bổ sung (ExtraInfo)
 let getDetailPatient = (id) => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
         try {
             let patient = await db.Patient.findOne({
                 where: { id: id },
@@ -234,8 +253,10 @@ let getDetailPatient = (id) => {
         }
     });
 };
+
+//Tìm danh sách bệnh nhân theo từ khóa tìm kiếm (email hoặc sđt)
 let getListBookingPatient = (keySearch) => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
         try {
             let patient = await db.Patient.findAll({
                 where: {
@@ -245,11 +266,13 @@ let getListBookingPatient = (keySearch) => {
                     ]
                 },
                 include: {
-                    model: db.User, 
+                    model: db.User,
                     required: false,
                     //attributes: ['name', 'email', 'address', 'phone']
                 },
-                order: [['id', 'DESC']]
+                order: [
+                    ['id', 'DESC']
+                ]
             });
             resolve(patient);
         } catch (e) {
@@ -258,8 +281,9 @@ let getListBookingPatient = (keySearch) => {
     });
 };
 
+//Lấy danh sách cá loh hỗ trợ theo ID bệnh nhân, kèm theo tên người hỗ trợ (nếu có)
 let getLogsPatient = (id) => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
         try {
             let logs = await db.SupporterLog.findAll({
                 where: {
@@ -268,11 +292,11 @@ let getLogsPatient = (id) => {
             });
 
             if (logs.length) {
-                await Promise.all(logs.map(async (log) => {
+                await Promise.all(logs.map(async(log) => {
                     if (log.supporterId) {
                         let supporter = await db.User.findOne({
                             where: { id: log.supporterId },
-                            attributes: [ 'name' ]
+                            attributes: ['name']
                         });
                         log.setDataValue('supporterName', supporter.name);
                     } else {
@@ -288,8 +312,9 @@ let getLogsPatient = (id) => {
     });
 };
 
+//Lấy các comment chưa được duyệt (status = false)
 let getComments = () => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
         try {
             let comments = await db.Comment.findAll({
                 where: {
@@ -304,8 +329,9 @@ let getComments = () => {
     });
 };
 
+//Lấy thông kê số lượng lịch đặt khám theo từng ngày trong một tháng cụ thể
 let getDailyBookingStats = (month, year) => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
         try {
             // Lấy thông tin bệnh nhân theo ngày, lọc theo tháng và năm
             let dailyStats = await db.Patient.findAll({
@@ -320,7 +346,9 @@ let getDailyBookingStats = (month, year) => {
                     ]
                 },
                 group: ['dateBooking'],
-                order: [[col('dateBooking'), 'ASC']]
+                order: [
+                    [col('dateBooking'), 'ASC']
+                ]
             });
             console.log(dailyStats);
             // Chuyển đổi kết quả để trả về mảng dữ liệu cho biểu đồ

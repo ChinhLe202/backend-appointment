@@ -13,14 +13,17 @@ import striptags from "striptags";
 
 import multer from "multer";
 
+//Giới hạn bài viết hiển thị trên trang chủ
 let LIMIT_POST = 5;
 
+//Các trạng thái đặt lịch
 const statusPendingId = 3;
 const statusFailedId = 2;
 const statusSuccessId = 1;
 const statusNewId = 4;
 
-let getHomePage = async (req, res) => {
+//Trang chủ-Lấy danh sách specialization, clinic, doctor, post
+let getHomePage = async(req, res) => {
     try {
         let specializations = await homeService.getSpecializations();
         let clinics = await homeService.getClinics();
@@ -39,16 +42,16 @@ let getHomePage = async (req, res) => {
         return res.render('main/homepage/pageNotFound.ejs');
     }
 };
-
+//Trang user-render ra trang user cùng tháng hiện tại
 let getUserPage = (req, res) => {
-    let currentMonth = new Date().getMonth() +1 ;
+    let currentMonth = new Date().getMonth() + 1;
     res.render("main/users/home.ejs", {
         user: req.user,
         currentMonth: currentMonth
     });
 };
-
-let getDetailSpecializationPage = async (req, res) => {
+//Trang chi tiết chuyên khoa-Lấy thông tin specialization, doctor, schedule for 5 day
+let getDetailSpecializationPage = async(req, res) => {
     try {
         let object = await specializationService.getSpecializationById(req.params.id);
         // using date to get schedule of doctors
@@ -75,8 +78,8 @@ let getDetailSpecializationPage = async (req, res) => {
         return res.render('main/homepage/pageNotFound.ejs');
     }
 };
-
-let getDetailDoctorPage = async (req, res) => {
+// Trang chi tiết bác sĩ - thông tin lịch khám, bài viết, chuyên khoa, phòng khám
+let getDetailDoctorPage = async(req, res) => {
     try {
         let currentDate = moment().format('DD/MM/YYYY');
         let sevenDaySchedule = [];
@@ -104,13 +107,13 @@ let getDetailDoctorPage = async (req, res) => {
         return res.render('main/homepage/pageNotFound.ejs');
     }
 };
-
+// Trang đặt lịch khám
 let getBookingPage = (req, res) => {
     res.render("main/homepage/bookingPage.ejs")
 };
 
-
-let getDetailPostPage = async (req, res) => {
+// Trang chi tiết bài viết
+let getDetailPostPage = async(req, res) => {
     try {
         let post = await supporterService.getDetailPostPage(req.params.id);
         res.render("main/homepage/post.ejs", {
@@ -121,8 +124,8 @@ let getDetailPostPage = async (req, res) => {
         return res.render('main/homepage/pageNotFound.ejs');
     }
 };
-
-let getDetailClinicPage = async (req, res) => {
+// Trang chi tiết phòng khám - gồm danh sách bác sĩ, lịch khám
+let getDetailClinicPage = async(req, res) => {
     try {
         let currentDate = moment().format('DD/MM/YYYY');
         let sevenDaySchedule = [];
@@ -143,12 +146,12 @@ let getDetailClinicPage = async (req, res) => {
         return res.render('main/homepage/pageNotFound.ejs');
     }
 };
-
+// Trang liên hệ
 let getContactPage = (req, res) => {
     return res.render('main/homepage/contact.ejs');
 };
-
-let getPostsWithPagination = async (req, res) => {
+// Trang tất cả bài viết có phân trang
+let getPostsWithPagination = async(req, res) => {
     let role = 'nope';
     let object = await supporterService.getPostsPagination(1, +process.env.LIMIT_GET_POST, role);
     return res.render("main/homepage/allPostsPagination.ejs", {
@@ -157,8 +160,8 @@ let getPostsWithPagination = async (req, res) => {
         striptags: striptags
     })
 };
-
-let getPostSearch = async (req, res) => {
+// Trang tìm kiếm bài viết
+let getPostSearch = async(req, res) => {
     let search = req.query.keyword;
     let results = await elasticService.findPostsByTerm(search);
     return res.render('main/homepage/searchPost.ejs', {
@@ -166,8 +169,8 @@ let getPostSearch = async (req, res) => {
         posts: results.hits.hits
     });
 };
-
-let getInfoBookingPage = async (req, res) => {
+// Trang xem thông tin đặt lịch của bệnh nhân
+let getInfoBookingPage = async(req, res) => {
     try {
         let patientId = req.params.id;
         let patient = await patientService.getInfoBooking(patientId);
@@ -179,8 +182,8 @@ let getInfoBookingPage = async (req, res) => {
         return res.render('main/homepage/pageNotFound.ejs');
     }
 };
-
-let postBookingDoctorPageWithoutFiles = async (req, res) => {
+// API đặt lịch bác sĩ không có file đính kèm
+let postBookingDoctorPageWithoutFiles = async(req, res) => {
     try {
         let item = req.body;
         item.statusId = statusPendingId;
@@ -201,9 +204,9 @@ let postBookingDoctorPageWithoutFiles = async (req, res) => {
         return res.status(500).json(e);
     }
 };
-
+// API đặt lịch bác sĩ có file đính kèm (form cũ)
 let postBookingDoctorPageNormal = (req, res) => {
-    imageImageOldForms(req, res, async (err) => {
+    imageImageOldForms(req, res, async(err) => {
         if (err) {
             console.log(err);
             if (err.message) {
@@ -245,7 +248,7 @@ let postBookingDoctorPageNormal = (req, res) => {
         }
     });
 };
-
+// Cấu hình lưu trữ hình ảnh mẫu đơn cũ của bệnh nhân
 let storageImageOldForms = multer.diskStorage({
     destination: (req, file, callback) => {
         callback(null, "src/public/images/patients");
@@ -255,13 +258,13 @@ let storageImageOldForms = multer.diskStorage({
         callback(null, imageName);
     }
 });
-
+// Middleware xử lý upload nhiều file ảnh
 let imageImageOldForms = multer({
     storage: storageImageOldForms,
     limits: { fileSize: 1048576 * 20 }
 }).array("oldForms");
-
-let getDetailPatientBooking = async (req, res) => {
+// API lấy chi tiết thông tin bệnh nhân theo ID
+let getDetailPatientBooking = async(req, res) => {
     try {
         let patient = await patientService.getDetailPatient(req.body.patientId);
         return res.status(200).json(patient);
@@ -270,8 +273,8 @@ let getDetailPatientBooking = async (req, res) => {
         return res.status(500).json(e);
     }
 };
-
-let getFeedbackPage = async (req, res) => {
+// Trang đánh giá bác sĩ
+let getFeedbackPage = async(req, res) => {
     try {
         let doctor = await doctorService.getDoctorForFeedbackPage(req.params.id);
         return res.render("main/homepage/feedback.ejs", {
@@ -282,8 +285,8 @@ let getFeedbackPage = async (req, res) => {
         return res.render('main/homepage/pageNotFound.ejs');
     }
 };
-
-let postCreateFeedback = async (req, res) => {
+// API gửi phản hồi đánh giá cho bác sĩ
+let postCreateFeedback = async(req, res) => {
     try {
         let feedback = await doctorService.createFeedback(req.body.data);
         return res.status(200).json({
@@ -295,16 +298,16 @@ let postCreateFeedback = async (req, res) => {
         return res.status(500).json(e);
     }
 };
-
+//Trang dành cho bệnh nhân
 let getPageForPatients = (req, res) => {
     return res.render("main/homepage/forPatients.ejs");
 };
-
+//Trang dành cho bác sĩ
 let getPageForDoctors = (req, res) => {
     return res.render("main/homepage/forDoctors.ejs");
 };
-
-let postSearchHomePage = async (req, res) => {
+//Xử lý tìm kiếm trên trang chủ
+let postSearchHomePage = async(req, res) => {
     try {
         let result = await homeService.postSearchHomePage(req.body.keyword);
         return res.status(200).json(result);
@@ -313,37 +316,37 @@ let postSearchHomePage = async (req, res) => {
         return res.status(500).json(e);
     }
 };
-
-let getPageAllClinics = async (req, res) => {
-    try{
+//Lấy và hiển thị danh sách tất cả phòng khám
+let getPageAllClinics = async(req, res) => {
+    try {
         let clinics = await homeService.getDataPageAllClinics();
 
-        return res.render("main/homepage/allClinics.ejs",{
+        return res.render("main/homepage/allClinics.ejs", {
             clinics: clinics
         })
-    }catch (e) {
+    } catch (e) {
         console.log(e);
     }
 };
-
-let getPageAllDoctors = async (req, res)=>{
-    try{
+//Lấy và hiển thị danh sách tất cả bác sĩ
+let getPageAllDoctors = async(req, res) => {
+    try {
         let doctors = await homeService.getDataPageAllDoctors();
-        return res.render("main/homepage/allDoctors.ejs",{
+        return res.render("main/homepage/allDoctors.ejs", {
             doctors: doctors
         })
-    }catch (e) {
+    } catch (e) {
         console.log(e);
     }
 };
-
-let getPageAllSpecializations =async (req, res)=>{
-    try{
+//Lấy và hiển thị danh sách tất cả chuyên khoa
+let getPageAllSpecializations = async(req, res) => {
+    try {
         let specializations = await homeService.getDataPageAllSpecializations();
-        return res.render("main/homepage/allSpecializations.ejs",{
+        return res.render("main/homepage/allSpecializations.ejs", {
             specializations: specializations
         })
-    }catch (e) {
+    } catch (e) {
         console.log(e);
     }
 };

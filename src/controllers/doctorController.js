@@ -7,6 +7,7 @@ import multer from "multer";
 
 const MAX_BOOKING = 2;
 
+//Hàm chuyển chuỗi ngày dạng dd/MM/yyyy thành object date
 function stringToDate(_date, _format, _delimiter) {
     let formatLowerCase = _format.toLowerCase();
     let formatItems = formatLowerCase.split(_delimiter);
@@ -19,7 +20,9 @@ function stringToDate(_date, _format, _delimiter) {
     return new Date(dateItems[yearIndex], month, dateItems[dayIndex]);
 
 }
-let getSchedule = async (req, res) => {
+
+//Hàm lấy lịch khám bác sĩ trong 3 ngày tới
+let getSchedule = async(req, res) => {
     try {
         let threeDaySchedules = [];
         for (let i = 0; i < 3; i++) {
@@ -31,7 +34,7 @@ let getSchedule = async (req, res) => {
             doctorId: req.user.id
         };
         let schedules = await doctorService.getDoctorSchedules(data);
-
+        //Convert và sắp xếp lịch theo thứ tự ngày
         schedules.forEach((x) => {
             x.date = Date.parse(stringToDate(x.date, "dd/MM/yyyy", "/"))
         });
@@ -52,13 +55,15 @@ let getSchedule = async (req, res) => {
     }
 };
 
+//Hàm render form tạo lịch cho bác sĩ
 let getCreateSchedule = (req, res) => {
     return res.render("main/users/admins/createSchedule.ejs", {
         user: req.user
     })
 };
 
-let postCreateSchedule = async (req, res) => {
+//Tạo lịch khám mới cho bác sĩ
+let postCreateSchedule = async(req, res) => {
     await doctorService.postCreateSchedule(req.user, req.body.schedule_arr, MAX_BOOKING);
     return res.status(200).json({
         "status": 1,
@@ -66,7 +71,8 @@ let postCreateSchedule = async (req, res) => {
     })
 };
 
-let getScheduleDoctorByDate = async (req, res) => {
+//Lấy lịch khám của bác sĩ theo ngày
+let getScheduleDoctorByDate = async(req, res) => {
     try {
         let object = await doctorService.getScheduleDoctorByDate(req.body.doctorId, req.body.date);
         let data = object.schedule;
@@ -82,7 +88,8 @@ let getScheduleDoctorByDate = async (req, res) => {
     }
 };
 
-let getInfoDoctorById = async (req, res) => {
+//Lấy thông tin chi tiết của bác sĩ theo ID
+let getInfoDoctorById = async(req, res) => {
     try {
         let doctor = await doctorService.getInfoDoctorById(req.body.id);
         return res.status(200).json({
@@ -95,8 +102,9 @@ let getInfoDoctorById = async (req, res) => {
     }
 };
 
-let getManageAppointment = async (req, res) => {
-    // let date = "30/03/2020";
+//Quản lý danh sách cuộc hẹn của bác sĩ trong ngày
+let getManageAppointment = async(req, res) => {
+    // let date = "30/03/2025";
     let currentDate = moment().format('DD/MM/YYYY');
     let canActive = false;
     let date = '';
@@ -130,15 +138,16 @@ let getManageAppointment = async (req, res) => {
     })
 };
 
+//Trả về giao diện thống kê biểu đồ bác sĩ
 let getManageChart = (req, res) => {
     return res.render("main/users/admins/manageChartDoctor.ejs", {
         user: req.user
     })
 };
 
-
+//Gửi file đính kèm(phiếu khám) cho bệnh nhân
 let postSendFormsToPatient = (req, res) => {
-    FileSendPatient(req, res, async (err) => {
+    FileSendPatient(req, res, async(err) => {
         if (err) {
             console.log(err);
             if (err.message) {
@@ -164,6 +173,7 @@ let postSendFormsToPatient = (req, res) => {
     });
 };
 
+//Cấu hình lưu trữ file cho bệnh nhân
 let storageFormsSendPatient = multer.diskStorage({
     destination: (req, file, callback) => {
         callback(null, "src/public/images/patients/remedy");
@@ -173,13 +183,14 @@ let storageFormsSendPatient = multer.diskStorage({
         callback(null, imageName);
     }
 });
-
+//Cấu hình middleware multer xử lý upload file
 let FileSendPatient = multer({
     storage: storageFormsSendPatient,
     limits: { fileSize: 1048576 * 20 }
 }).array("filesSend");
 
-let postCreateChart = async (req, res) => {
+//Tạo dữ liệu cho biểu đồ thống kê bác sĩ
+let postCreateChart = async(req, res) => {
     try {
         let object = await userService.getInfoDoctorChart(req.body.month);
         return res.status(200).json(object);
@@ -189,16 +200,18 @@ let postCreateChart = async (req, res) => {
     }
 };
 
-let postAutoCreateAllDoctorsSchedule = async (req, res) => {
-    try {
-        let data = await userService.createAllDoctorsSchedule();
-        return res.status(200).json(data);
-    } catch (e) {
-        console.log(e);
-        return res.status(500).json(e);
+//Tự động tạo cho tất cả bác sĩ
+let postAutoCreateAllDoctorsSchedule = async(req, res) => {
+        try {
+            let data = await userService.createAllDoctorsSchedule();
+            return res.status(200).json(data);
+        } catch (e) {
+            console.log(e);
+            return res.status(500).json(e);
+        }
     }
-}
-let getListDoctors = async (req, res) => {
+    //Lấy danh sách tất cả bác sĩ
+let getListDoctors = async(req, res) => {
     try {
         let doctors = await userService.getInfoDoctors(); // Gọi tới hàm getInfoDoctors từ service của bạn
         return res.status(200).json({
@@ -215,12 +228,13 @@ let getListDoctors = async (req, res) => {
         });
     }
 };
-let getListDoctorsFilter = async (req, res) => {
+//Lọc danh sách bác sĩ theo tên, phòng khám, chuyên khoa
+let getListDoctorsFilter = async(req, res) => {
     try {
         let clinicId = req.query.clinicId;
         let specializationId = req.query.specializationId;
         let searchText = req.query.searchText;
-        let doctors = await userService.getInfoDoctorsFilter(searchText, clinicId, specializationId); 
+        let doctors = await userService.getInfoDoctorsFilter(searchText, clinicId, specializationId);
         return res.status(200).json({
             status: 1,
             message: 'success',
@@ -235,8 +249,8 @@ let getListDoctorsFilter = async (req, res) => {
         });
     }
 };
-
-let postPatientExam = async (req, res) => {
+//Tạo thông tin phiếu khám cho bệnh nhân
+let postPatientExam = async(req, res) => {
     try {
         let item = req.body;
         item.createdAt = Date.now();
@@ -252,9 +266,11 @@ let postPatientExam = async (req, res) => {
         return res.status(500).json(e);
     }
 };
-let updatePatientExam = async (req, res) => {
+
+//Cập nhật phiếu khám
+let updatePatientExam = async(req, res) => {
     //let examId = req.params.id;  // Lấy id từ params
-    let data = req.body;         // Lấy thông tin cần cập nhật từ body request
+    let data = req.body; // Lấy thông tin cần cập nhật từ body request
 
     try {
         let result = await patientExamService.updatePatientExamById(data);
@@ -265,8 +281,8 @@ let updatePatientExam = async (req, res) => {
 };
 
 // Hàm để lấy danh sách patient_exam theo patientId
-let getPatientExams = async (req, res) => {
-    let patientId = req.query.patientId;  // Lấy patientId từ params
+let getPatientExams = async(req, res) => {
+    let patientId = req.query.patientId; // Lấy patientId từ params
     try {
         let result = await patientExamService.getPatientExamsByPatientId(patientId);
         return res.status(200).json(result);
@@ -274,8 +290,8 @@ let getPatientExams = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 };
-
-let getDetailPatientExam = async (req, res) => {
+//Hàm lấy chi tiết phiếu bệnh theo bệnh nhân và ngày/giờ khám
+let getDetailPatientExam = async(req, res) => {
     let patientId = req.query.patientId;
     let dateBooking = req.query.dateBooking;
     let timeBooking = req.query.timeBooking;

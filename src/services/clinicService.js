@@ -5,33 +5,37 @@ const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
 let maxBooking = 5;
+//Lấy thông tin chi tiết 1 phòng khám bao gồm danh sách bác sĩ, lịch khám khả dụng và dsach địa điểm
 let getDetailClinicPage = (id, date) => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
         try {
             let clinic = await db.Clinic.findOne({
                 where: { id: id },
-                attributes: [ 'id', 'name', 'image', 'address', 'phone', 'introductionHTML', 'description' ],
+                attributes: ['id', 'name', 'image', 'address', 'phone', 'introductionHTML', 'description'],
             });
 
-            if(!clinic){
+            if (!clinic) {
                 reject(`Can't get clinic with id = ${id}`);
             }
 
             let doctors = await db.Doctor_User.findAll({
                 where: { clinicId: id },
-                attributes: [ 'clinicId' ],
+                attributes: ['clinicId'],
                 include: {
                     model: db.User,
-                    attributes: [ 'id', 'name', 'avatar', 'address', 'description' ]
+                    attributes: ['id', 'name', 'avatar', 'address', 'description']
                 }
             });
 
-            await Promise.all(doctors.map(async (doctor) => {
+            await Promise.all(doctors.map(async(doctor) => {
                 let schedules = await db.Schedule.findAll({
                     where: {
-                        doctorId: doctor.User.id, date: date, sumBooking: { [Op.lt]: maxBooking }
+                        doctorId: doctor.User.id,
+                        date: date,
+                        sumBooking: {
+                            [Op.lt]: maxBooking }
                     },
-                    attributes: [ 'id', 'date', 'time' ]
+                    attributes: ['id', 'date', 'time']
                 });
 
                 let dateNow = new Date();
@@ -65,9 +69,9 @@ let getDetailClinicPage = (id, date) => {
         }
     });
 };
-
+//Tạo mới 1 phòng khám
 let createNewClinic = (item) => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
         try {
             let clinic = await db.Clinic.create(item);
             resolve(clinic);
@@ -76,9 +80,9 @@ let createNewClinic = (item) => {
         }
     });
 };
-
+//Xóa 1 phòng khám theo ID, đồng thời xóa các bản ghi Doctor_User liên quan
 let deleteClinicById = (id) => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
         try {
             await db.Clinic.destroy({
                 where: { id: id }
@@ -101,9 +105,9 @@ let deleteClinicById = (id) => {
         }
     });
 };
-
+//Lấy thông tin 1 phòng khám theo ID
 let getClinicById = (id) => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
         try {
             let clinic = await db.Clinic.findOne({
                 where: { id: id },
@@ -114,9 +118,9 @@ let getClinicById = (id) => {
         }
     });
 };
-
+//Cập nhật thông tin 1 phòng khám
 let updateClinic = (data) => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
         try {
             let clinic = await db.Clinic.findOne({
                 where: { id: data.id }
@@ -128,8 +132,9 @@ let updateClinic = (data) => {
         }
     });
 };
+//Lấy danh sách tất cả các phòng khám
 let getListClinics = () => {
-    return new Promise((async (resolve, reject) => {
+    return new Promise((async(resolve, reject) => {
         try {
             let clinics = await db.Clinic.findAll();
             resolve(clinics);
@@ -138,12 +143,15 @@ let getListClinics = () => {
         }
     }));
 };
+//Lấy danh sách 5 phòng khám mới nhất
 let getTop5Clinics = () => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
         try {
             let clinics = await db.Clinic.findAll({
-                limit: 5,  
-                order: [['createdAt', 'DESC']]  
+                limit: 5,
+                order: [
+                    ['createdAt', 'DESC']
+                ]
             });
             resolve(clinics);
         } catch (e) {

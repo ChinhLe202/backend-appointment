@@ -3,7 +3,8 @@ import clinicService from "./../services/clinicService";
 import specializationService from "./../services/specializationService"
 import patientService from "./../services/patientService";
 
-let getInfoClinicById = async (req, res) => {
+// Lấy thông tin chi tiết phòng khám
+let getInfoClinicById = async(req, res) => {
     try {
         var clinicId = req.query.id;
         let clinic = await clinicService.getClinicById(clinicId);
@@ -16,7 +17,8 @@ let getInfoClinicById = async (req, res) => {
     }
 };
 
-let getListClincs = async (req, res) => {
+// Lấy danh sách tất cả các phòng khám
+let getListClincs = async(req, res) => {
     try {
         let clinics = await clinicService.getListClinics(); // Gọi tới hàm getInfoDoctors từ service của bạn
         return res.status(200).json({
@@ -34,7 +36,8 @@ let getListClincs = async (req, res) => {
     }
 };
 
-let getTop5Clincs = async (req, res) => {
+// Lấy 5 phòng khám hàng đầu
+let getTop5Clincs = async(req, res) => {
     try {
         let clinics = await clinicService.getTop5Clinics(); // Gọi tới hàm getInfoDoctors từ service của bạn
         return res.status(200).json({
@@ -52,7 +55,8 @@ let getTop5Clincs = async (req, res) => {
     }
 };
 
-let getListSpecializations = async (req, res) => {
+// Lấy danh sách tất cả các chuyên khoa
+let getListSpecializations = async(req, res) => {
     try {
         let specializations = await specializationService.getAllSpecializations(); // Gọi tới hàm getInfoDoctors từ service của bạn
         return res.status(200).json({
@@ -70,7 +74,8 @@ let getListSpecializations = async (req, res) => {
     }
 };
 
-let getListBookingPatients = async (req, res) => {
+// Lấy danh sách bệnh nhân đã đặt lịch khám
+let getListBookingPatients = async(req, res) => {
     try {
         console.log(req.params.keySearch);
         let patientBookings = await patientService.getListBookingPatient(req.params.keySearch); // Gọi tới hàm getInfoDoctors từ service của bạn

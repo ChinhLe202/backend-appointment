@@ -3,13 +3,15 @@ import removeMd from "remove-markdown";
 import syncElastic from "./syncsElaticService";
 import helper from "../helper/client";
 
+//Lấy danh sách tất cả bài viết
 let getAllPosts = () => {
-    return new Promise((async (resolve, reject) => {
+    return new Promise((async(resolve, reject) => {
         try {
             let posts = await db.Post.findAll({
-                attributes: [ 'id', 'title', 'writerId', 'createdAt' ],
+                attributes: ['id', 'title', 'writerId', 'createdAt'],
             });
-            await Promise.all(posts.map(async (post) => {
+            //Bổ sung thông tin người viết và ngày tạo theo định dạng người dùng
+            await Promise.all(posts.map(async(post) => {
                 let supporter = await helper.getSupporterById(post.writerId);
                 let dateClient = helper.convertDateClient(post.createdAt);
                 post.setDataValue('writerName', supporter.name);
@@ -24,8 +26,9 @@ let getAllPosts = () => {
     }));
 };
 
+//Tạo bài viết mới
 let postCreatePost = (item) => {
-    return new Promise((async (resolve, reject) => {
+    return new Promise((async(resolve, reject) => {
         try {
             let post = await db.Post.create(item);
 
@@ -49,12 +52,13 @@ let postCreatePost = (item) => {
     }));
 };
 
+//Lấy chi tiết bài viết theo id
 let getDetailPostPage = (id) => {
-    return new Promise((async (resolve, reject) => {
+    return new Promise((async(resolve, reject) => {
         try {
             let post = await db.Post.findOne({
                 where: { id: id },
-                attributes: [ 'id', 'title', 'contentHTML', 'contentMarkdown', 'forDoctorId', 'forSpecializationId', 'forClinicId' ]
+                attributes: ['id', 'title', 'contentHTML', 'contentMarkdown', 'forDoctorId', 'forSpecializationId', 'forClinicId']
             });
             if (!post) {
                 reject(`Can't get post with id=${id}`);
@@ -66,8 +70,9 @@ let getDetailPostPage = (id) => {
     }));
 };
 
+//Lấy danh sách supporter có roleId = 3
 let getAllSupporters = () => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
         try {
             let supporters = await db.User.findAll({
                 where: { roleId: 3 }
@@ -81,21 +86,24 @@ let getAllSupporters = () => {
     });
 };
 
+//Lấy danh sách bài viết có phân trang theo role (admin or user thường)
 let getPostsPagination = (page, limit, role) => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
         try {
             let posts = "";
             //only get bài đăng y khoa
+            //Nếu là admin: lấy tất cả bài viết
             if (role === "admin") {
                 posts = await db.Post.findAndCountAll({
                     offset: (page - 1) * limit,
                     limit: limit,
-                    attributes: [ 'id', 'title', 'contentMarkdown', 'contentHTML', 'createdAt', 'writerId' ],
+                    attributes: ['id', 'title', 'contentMarkdown', 'contentHTML', 'createdAt', 'writerId'],
                     order: [
-                        [ 'createdAt', 'DESC' ]
+                        ['createdAt', 'DESC']
                     ],
                 });
             } else {
+                //Nếu là người dùng: chỉ lấy bài viết y khoa
                 posts = await db.Post.findAndCountAll({
                     where: {
                         forDoctorId: -1,
@@ -104,16 +112,17 @@ let getPostsPagination = (page, limit, role) => {
                     },
                     offset: (page - 1) * limit,
                     limit: limit,
-                    attributes: [ 'id', 'title', 'contentMarkdown', 'contentHTML', 'createdAt', 'writerId' ],
+                    attributes: ['id', 'title', 'contentMarkdown', 'contentHTML', 'createdAt', 'writerId'],
                     order: [
-                        [ 'createdAt', 'DESC' ]
+                        ['createdAt', 'DESC']
                     ],
                 });
             }
 
             let total = Math.ceil(posts.count / limit);
 
-            await Promise.all(posts.rows.map(async (post) => {
+            //Bổ sung tên người viết và ngày đăng định dạng client
+            await Promise.all(posts.rows.map(async(post) => {
                 let supporter = await helper.getSupporterById(post.writerId);
                 let dateClient = helper.convertDateClient(post.createdAt);
                 post.setDataValue('writerName', supporter.name);
@@ -131,12 +140,13 @@ let getPostsPagination = (page, limit, role) => {
     });
 };
 
+//Xóa bài viết theo id
 let deletePostById = (id) => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
         try {
             let post = await db.Post.findOne({
                 where: { id: id },
-                attributes: [ 'id', 'forDoctorId', 'forSpecializationId', 'forClinicId' ]
+                attributes: ['id', 'forDoctorId', 'forSpecializationId', 'forClinicId']
             });
 
             // chỉ delete bài đăng y khoa
@@ -145,6 +155,7 @@ let deletePostById = (id) => {
                 await syncElastic.deletePost(post.id);
             }
 
+            //Xóa bài viết trong DB
             await post.destroy();
             resolve(true);
         } catch (e) {
@@ -153,12 +164,13 @@ let deletePostById = (id) => {
     });
 };
 
+//Cập nhật bài viết
 let putUpdatePost = (item) => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
         try {
             let post = await db.Post.findOne({
                 where: { id: item.id },
-                attributes: [ 'id', 'forDoctorId', 'forSpecializationId', 'forClinicId' ]
+                attributes: ['id', 'forDoctorId', 'forSpecializationId', 'forClinicId']
             });
             await post.update(item);
 
@@ -183,8 +195,9 @@ let putUpdatePost = (item) => {
     });
 };
 
+//Đánh dấu comment là đã xử lý
 let doneComment = (id) => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
         try {
             let comment = await db.Comment.findOne({
                 where: { id: id }

@@ -81,7 +81,7 @@ function createNewClinic(markdownIntroClinic, converter) {
             formData.append('introductionHTML', contentHTML);
 
             let file = document.getElementById('image-clinic').files[0];
-            
+
             // Sử dụng FileReader để chuyển đổi file ảnh thành chuỗi Base64
             let reader = new FileReader();
 
@@ -167,7 +167,7 @@ function updateClinic(markdownIntroClinic, converter) {
             formData.append('introductionHTML', contentHTML);
 
             let file = document.getElementById('image-clinic').files[0];
-            
+
             // Sử dụng FileReader để chuyển đổi file ảnh thành chuỗi Base64
             let reader = new FileReader();
 
@@ -338,7 +338,7 @@ function deleteDoctorById() {
 
 function showModalInfoDoctor() {
     $('.show-doctor-info').on('click', function(e) {
-        e.prefentDefault();
+        e.preventDefault();
         let id = $(this).data('doctor-id');
 
         $.ajax({
@@ -409,7 +409,7 @@ function updateDoctor() {
         // Nếu người dùng có chọn ảnh
         if ($('#image-clinic').val()) {
             let file = document.getElementById('image-clinic').files[0];
-            
+
             // Sử dụng FileReader để chuyển đổi file ảnh thành chuỗi Base64
             let reader = new FileReader();
 
@@ -447,6 +447,7 @@ function updateDoctor() {
         }
     });
 }
+
 function handleUpdateDoctorNormal(formData) {
     $.ajax({
         method: "PUT",
@@ -1107,7 +1108,7 @@ function handleDoctorViewInfoPatient() {
                     if (data.ExtraInfo.oldForms) {
                         let images = JSON.parse(data.ExtraInfo.oldForms);
                         let html = '';
-                        for (let [ key, value ] of Object.entries(images)) {
+                        for (let [key, value] of Object.entries(images)) {
                             html += `
                               <a href="/images/patients/${value}" class="mr-3" target="_blank" title="Click to show the image">
                                 <span>${value}</span>
@@ -1288,7 +1289,7 @@ function statisticalAdmin(month) {
     })
 }
 
-function handleFindStatisticalAdmin(){
+function handleFindStatisticalAdmin() {
     $('#findStatisticalAdmin').on('click', function() {
         statisticalAdmin($('#monthAnalyse').val())
     })
@@ -1367,7 +1368,6 @@ $(document).ready(function(e) {
     doneComment();
 
     let month = new Date().getMonth();
-    statisticalAdmin(month+1);
+    statisticalAdmin(month + 1);
     handleFindStatisticalAdmin();
 });
-
